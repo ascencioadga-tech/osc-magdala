@@ -1,26 +1,197 @@
 @import "tailwindcss";
 
+/*
+  One Step Closer — Brand System v1.0
+  Palette: burgundy / cream / gold / terracotta / parchment.
+  80/15/5 rule: cream is the page · burgundy is the voice · gold is the punctuation.
+*/
+
+@theme {
+  --color-burgundy: #6a2045;
+  --color-burgundy-deep: #3f1019;
+  --color-burgundy-ink: #2a0810;
+  --color-gold: #c8923a;
+  --color-gold-light: #e0b964;
+  --color-terracotta: #b5552e;
+  --color-blue: #3e5c7a;
+  --color-blue-light: #7a95b0;
+  --color-sand: #f2e8d5;
+  --color-cream: #faf5ea;
+  --color-parchment: #ede0c4;
+  --color-ink: #2a1418;
+  --color-olive: #6b7a4a;
+
+  --font-sans: var(--font-sans-body);
+  --font-display: var(--font-display);
+  --font-serif: var(--font-serif);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-line: rgba(92, 26, 43, 0.18);
+  --color-line-soft: rgba(92, 26, 43, 0.10);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+}
+
+section[id] {
+  scroll-margin-top: 96px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans-body), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-burgundy-ink);
+}
+
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+.font-serif {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+.eyebrow {
+  font-family: var(--font-sans-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.border-line {
+  border-color: var(--color-line);
+}
+.border-line-soft {
+  border-color: var(--color-line-soft);
+}
+
+@keyframes water-shimmer {
+  0%, 100% { transform: translateX(0); opacity: 0.55; }
+  50% { transform: translateX(-1.5%); opacity: 0.78; }
+}
+.water-shimmer { animation: water-shimmer 7s ease-in-out infinite; }
+
+@keyframes ripple-pulse {
+  0% { transform: scale(0.85) translate(-50%, -50%); opacity: 0.55; transform-origin: 0 0; }
+  100% { transform: scale(1.6) translate(-50%, -50%); opacity: 0; transform-origin: 0 0; }
+}
+.ripple-pulse {
+  /* Use box-shadow pulse so we don't fight an existing translate-x/y center */
+  animation: ripple-pulse 2.4s ease-out infinite;
+}
+
+/* Polaroid wall marquee — used in OSCInAction. The inner list contains
+   two copies of the photos side-by-side; this animation slides exactly
+   one copy's width to the left, then loops. Pause-on-hover via
+   group-hover:[animation-play-state:paused] in the JSX. */
+@keyframes polaroid-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.polaroid-marquee {
+  animation: polaroid-marquee 75s linear infinite;
+  will-change: transform;
+}
+
+/* Diagonal walking footsteps — used in OSCInAction section.
+   Each footprint has its own animation-delay; they appear in sequence
+   along a path from top-left to bottom-right, then loop. The wrapper
+   span carries the rotation + L/R flip; this keyframe handles opacity
+   + a small "press into the sand" scale and lift. */
+@keyframes footstep-walk {
+  0%, 5%  { opacity: 0; transform: translateY(10px) scale(0.82); }
+  12%     { opacity: 0.7; transform: translateY(0) scale(1); }
+  82%     { opacity: 0.7; transform: translateY(0) scale(1); }
+  100%    { opacity: 0; transform: translateY(-4px) scale(0.96); }
+}
+.footstep-walk {
+  /* Slower + ease-out so each step feels deliberate, like a foot pressing
+     into wet sand rather than a snappy UI animation. */
+  animation: footstep-walk 9s cubic-bezier(0.22, 0.8, 0.32, 1) infinite;
+  will-change: opacity, transform;
+}
+
+/* Slow gold embers that drift upward — used in Crossroads section */
+@keyframes ember-drift {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 0.85; }
+  50%  { transform: translate3d(12px, -180px, 0); opacity: 0.85; }
+  90%  { opacity: 0.65; }
+  100% { transform: translate3d(-6px, -360px, 0); opacity: 0; }
+}
+.ember {
+  animation-name: ember-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+/* Slow gold pulse on the first stepping stone to invite the first tap */
+@keyframes stone-hint {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(224, 185, 100, 0.55),
+      0 0 0 0 rgba(224, 185, 100, 0.35);
+  }
+  60% {
+    box-shadow:
+      0 0 0 14px rgba(224, 185, 100, 0),
+      0 0 0 28px rgba(224, 185, 100, 0);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(224, 185, 100, 0),
+      0 0 0 0 rgba(224, 185, 100, 0);
+  }
+}
+.stone-hint {
+  border-radius: 9999px;
+  animation: stone-hint 2.6s ease-out infinite;
+}
+
+/* Slow Ken-Burns on the hero video — barely perceptible, frame stays alive */
+@keyframes hero-slow-zoom {
+  0%   { transform: scale(1.04) translate3d(0, 0, 0); }
+  50%  { transform: scale(1.10) translate3d(-1%, -0.5%, 0); }
+  100% { transform: scale(1.04) translate3d(0, 0, 0); }
+}
+.hero-slow-zoom {
+  animation: hero-slow-zoom 60s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Vertical scroll-cue line that fills downward and resets — quiet hint */
+@keyframes scroll-cue {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 0.65; }
+  60%  { transform: scaleY(1); transform-origin: top; opacity: 0.65; }
+  61%  { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+.animate-scroll-cue {
+  animation: scroll-cue 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slow-zoom,
+  .animate-scroll-cue,
+  .water-shimmer,
+  .ripple-pulse {
+    animation: none !important;
+  }
 }
