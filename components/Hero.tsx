@@ -51,18 +51,19 @@ export function Hero() {
     >
       {/* Background video + ceremonial burgundy gradient overlay */}
       <div className="absolute inset-0 -z-10">
-        {/* No autoplay — the poster (Galilee still) stands in until a future
-            interaction explicitly triggers playback. */}
+        {/* Autoplaying, muted background video — the Galilee still is the
+            poster shown until the first frame is ready. */}
         <video
+          autoPlay
           loop
           muted
           playsInline
-          preload="none"
+          preload="auto"
           poster="/hero-galilee.jpg"
           className="h-full w-full object-cover hero-slow-zoom"
           aria-hidden="true"
         >
-          <source src="/magdala-crossroads.mp4" type="video/mp4" />
+          <source src="/magdala-crossroads-v2.mp4" type="video/mp4" />
         </video>
         <div
           className="absolute inset-0"
