@@ -1,27 +1,51 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { PrayerModal } from "@/components/PrayerModal";
 
 const reverentEase = [0.22, 0.8, 0.32, 1] as const;
 
 export function Prayer() {
   const [open, setOpen] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const inView = useInView(sectionRef, { amount: 0.25, margin: "-10% 0px" });
+
+  // The Prayer backdrop is ambient — it should be playing the moment the
+  // visitor reaches this section, and quietly pause when they leave so it
+  // never plays off-screen. Muted playback is permitted by browsers without
+  // a click.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (inView) {
+      v.muted = true; // safety: ensure muted so autoplay is allowed
+      v.play().catch(() => {
+        /* ignore autoplay rejections (e.g. low-power mode) */
+      });
+    } else {
+      v.pause();
+    }
+  }, [inView]);
 
   return (
     <>
       <section
         id="prayer"
+        ref={sectionRef}
         className="relative isolate overflow-hidden"
       >
-        {/* Background video — Jon17 OSC */}
+        {/* Background video — Jon17 OSC. Plays automatically (muted) once the
+            section comes into view; pauses when it leaves. */}
         <div className="absolute inset-0 -z-10">
           <video
-            autoPlay
+            ref={videoRef}
             loop
             muted
             playsInline
+            preload="auto"
+            poster="/jon17-osc-poster.jpg"
             className="h-full w-full object-cover"
             aria-hidden="true"
           >

@@ -10,6 +10,7 @@ import {
   type Variants,
 } from "framer-motion";
 import { hero } from "@/lib/content";
+import { VideoPlayer } from "@/components/VideoPlayer";
 
 // Brand "we say" voice phrases — meditative cycle below the buttons.
 const voiceLines = [
@@ -50,11 +51,13 @@ export function Hero() {
     >
       {/* Background video + ceremonial burgundy gradient overlay */}
       <div className="absolute inset-0 -z-10">
+        {/* No autoplay — the poster (Galilee still) stands in until a future
+            interaction explicitly triggers playback. */}
         <video
-          autoPlay
           loop
           muted
           playsInline
+          preload="none"
           poster="/hero-galilee.jpg"
           className="h-full w-full object-cover hero-slow-zoom"
           aria-hidden="true"
@@ -140,7 +143,7 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Right rail — verse */}
+          {/* Right rail — Fr. Juan video */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -148,17 +151,24 @@ export function Hero() {
             transition={{ duration: 0.9, delay: 2.1, ease: reverentEase }}
             className="md:pb-2"
           >
-            <div className="hidden md:block">
-              <p className="eyebrow text-gold-light/85">
-                Magdala · Sea of Galilee
-              </p>
+            <p className="eyebrow hidden text-gold-light/85 md:block">
+              Magdala · Sea of Galilee
+            </p>
+
+            <div className="mt-5 md:mt-6">
+              <VideoPlayer
+                src="/fr-juan-osc.mp4"
+                type="video/mp4"
+                poster="/fr-juan-osc-poster.jpg"
+                label="Fr. Juan — the vision of One Step Closer"
+                className="rounded-xl border border-cream/15 shadow-[0_24px_60px_-25px_rgba(0,0,0,0.55)]"
+              />
             </div>
-            <div className="font-serif mt-8 max-w-md text-lg italic leading-relaxed text-cream/75 md:text-xl">
-              “That they may all be one … so that the world may believe.”
-              <span className="eyebrow mt-3 block text-[11px] not-italic text-gold-light/80">
-                — John 17 : 21
-              </span>
-            </div>
+
+            <p className="font-serif mt-4 text-sm italic text-cream/75 md:text-base">
+              Fr. Juan Solana, founder of Magdala — on the vision of One Step
+              Closer.
+            </p>
           </motion.div>
         </div>
       </motion.div>

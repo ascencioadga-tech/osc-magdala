@@ -31,8 +31,20 @@ export type Stone = {
   cta: { label: string; href: string };
   /** Optional video for the expanded panel (autoplay-loop-muted with full controls) */
   video?: string;
-  /** Optional still image for the expanded panel (used when no video) */
+  /** Optional YouTube URL or video ID. Takes precedence over `video` / `images`. */
+  youtube?: string;
+  /** Optional still image for the expanded panel (used when no video / no images carousel) */
   image?: string;
+  /** Optional rotating carousel of photos for the expanded panel. Takes precedence over `image`.
+      Natural width/height let the frame adapt to each image's aspect so every shot is shown
+      in full with no cropping. */
+  images?: {
+    src: string;
+    alt?: string;
+    caption?: string;
+    width: number;
+    height: number;
+  }[];
 };
 
 export const stones: Stone[] = [
@@ -43,6 +55,29 @@ export const stones: Stone[] = [
     title: "A restaurant at Magdala, built together",
     body: "The inaugural shot of One Step Closer: a restaurant at Magdala, built and run by Christians of many denominations. Pilgrims share meals and fellowship; the witness begins at table.",
     cta: { label: "Help build the restaurant", href: "#donate" },
+    images: [
+      {
+        src: "/restaurant/restaurant-1.jpg",
+        alt: "Magdala Restaurant — exterior view (1)",
+        caption: "Magdala Restaurant · 1",
+        width: 1800,
+        height: 1005,
+      },
+      {
+        src: "/restaurant/restaurant-2.jpg",
+        alt: "Magdala Restaurant — exterior view (2)",
+        caption: "Magdala Restaurant · 2",
+        width: 1800,
+        height: 1101,
+      },
+      {
+        src: "/restaurant/restaurant-3.jpg",
+        alt: "Magdala Restaurant — exterior view (3)",
+        caption: "Magdala Restaurant · 3",
+        width: 1800,
+        height: 1194,
+      },
+    ],
   },
   {
     number: 2,
@@ -51,6 +86,7 @@ export const stones: Stone[] = [
     title: "Volunteers serving side by side",
     body: "A shared volunteer program where Christians from different faith communities welcome pilgrims together. Mutual respect, real cooperation — hospitality as a sign of the unity we still hope for.",
     cta: { label: "Volunteer with us", href: "#take-a-step" },
+    youtube: "https://www.youtube.com/watch?v=YTih2pqq7V4&t=4s",
   },
   {
     number: 3,
@@ -183,7 +219,7 @@ export const takeAStep = {
       key: "donors",
       title: "For Friends and Supporters",
       body: "Help build the restaurant, fund volunteers, commission the artwork. Every gift is a stone laid in the path.",
-      cta: { label: "Donate", href: "#donate" },
+      cta: { label: "Donate", href: "/benefactors" },
     },
   ],
 };

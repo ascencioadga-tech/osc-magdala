@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { stones, type Stone as StoneData } from "@/lib/content";
@@ -864,7 +865,7 @@ function FootprintIcon({ size = 14 }: { size?: number }) {
 
 function StonePanel({ stone }: { stone: StoneData }) {
   return (
-    <div className="grid items-start gap-10 rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,16,25,0.25)] md:grid-cols-[1.1fr_1fr] md:p-12">
+    <div className="grid items-center gap-10 rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,16,25,0.25)] md:grid-cols-[1.1fr_1fr] md:p-12">
       <div>
         <p className="eyebrow text-terracotta">
           Stone {stone.number} · {stone.label}
@@ -882,11 +883,21 @@ function StonePanel({ stone }: { stone: StoneData }) {
           {stone.cta.label} <span aria-hidden="true">→</span>
         </Link>
       </div>
-      {stone.video ? (
+      {stone.youtube ? (
+        <YouTubeStoneFrame
+          url={stone.youtube}
+          label={`Stone ${stone.number} — ${stone.label} video`}
+        />
+      ) : stone.video ? (
         <VideoPlayer
           src={stone.video}
           type="video/mp4"
           label={`Stone ${stone.number} — ${stone.label} video`}
+        />
+      ) : stone.images && stone.images.length > 0 ? (
+        <StoneCarousel
+          images={stone.images}
+          label={`Stone ${stone.number} — ${stone.label}`}
         />
       ) : (
         <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-sand">
@@ -905,6 +916,216 @@ function PhotoPlaceholder({ label }: { label: string }) {
       <div className="eyebrow text-center text-[11px] text-burgundy/65">
         {label}
       </div>
+    </div>
+  );
+}
+
+// ─── Stone photo carousel ─────────────────────────────────────────────
+// Auto-advancing 3:2 frame with crossfade + slow Ken-Burns drift,
+// pause-on-hover, click-dot navigation, and a soft caption strip.
+
+function StoneCarousel({
+  images,
+  label,
+}: {
+  images: NonNullable<StoneData["images"]>;
+  label: string;
+}) {
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused || images.length < 2) return;
+    const id = window.setInterval(
+      () => setI((v) => (v + 1) % images.length),
+      5400,
+    );
+    return () => window.clearInterval(id);
+  }, [images.length, paused]);
+
+  const current = images[i];
+
+  return (
+    <figure
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      className="relative flex flex-col"
+      aria-label={label}
+    >
+      {/* Frame — adapts its aspect-ratio to whichever image is currently
+          showing, so every shot fills the box edge-to-edge with zero
+          cropping. CSS transitions smooth the height change between slides. */}
+      <div
+        className="relative w-full overflow-hidden rounded-xl bg-burgundy-ink shadow-[0_24px_50px_-28px_rgba(63,16,25,0.35)] transition-[aspect-ratio] duration-700 ease-out"
+        style={{ aspectRatio: `${current.width} / ${current.height}` }}
+      >
+        <AnimatePresence initial={false} mode="sync">
+          <motion.div
+            key={current.src}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.1, ease: reverentEase }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={current.src}
+              alt={current.alt ?? label}
+              fill
+              sizes="(min-width: 1024px) 36vw, (min-width: 768px) 44vw, 92vw"
+              className="object-cover"
+              priority={i === 0}
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Top-left corner label */}
+        <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 text-cream/90">
+          <span className="block h-px w-6 bg-gold-light" />
+          <span className="text-[10px] uppercase tracking-[0.28em]">
+            Magdala Restaurant
+          </span>
+        </div>
+
+        {/* Caption — gradient strip on top of image */}
+        {current.caption ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-burgundy-deep/85 via-burgundy-deep/30 to-transparent px-4 py-3">
+            <p className="font-serif text-sm italic text-cream md:text-base">
+              {current.caption}
+            </p>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Dot indicators + paused state */}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {images.map((s, idx) => (
+            <button
+              key={s.src}
+              type="button"
+              onClick={() => setI(idx)}
+              aria-label={`Show image ${idx + 1}${s.caption ? `: ${s.caption}` : ""}`}
+              className={[
+                "h-1.5 rounded-full transition-[width,background-color] duration-500 ease-out",
+                idx === i
+                  ? "w-10 bg-burgundy"
+                  : "w-1.5 bg-burgundy/25 hover:bg-burgundy/45",
+              ].join(" ")}
+            />
+          ))}
+        </div>
+        <span className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
+          {paused ? "Paused" : "Auto"}
+        </span>
+      </div>
+    </figure>
+  );
+}
+
+// ─── YouTube frame for a stone panel ──────────────────────────────────
+// Accepts any standard YouTube URL form (watch?v=, youtu.be/, /embed/),
+// or a bare 11-char video ID. Parses the optional `t=` / `start=` param
+// for a deep-link start time (supports "4s", "1m30s", or bare seconds).
+
+function parseYouTube(input: string): { id: string; start?: number } | null {
+  if (!input) return null;
+  const trimmed = input.trim();
+  // Bare 11-char video ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return { id: trimmed };
+
+  let id: string | null = null;
+  let timeParam: string | null = null;
+  try {
+    const url = new URL(trimmed);
+    if (url.hostname.includes("youtu.be")) {
+      id = url.pathname.replace(/^\//, "").split("/")[0] ?? null;
+    } else if (url.pathname.startsWith("/embed/")) {
+      id = url.pathname.split("/")[2] ?? null;
+    } else {
+      id = url.searchParams.get("v");
+    }
+    timeParam = url.searchParams.get("t") ?? url.searchParams.get("start");
+  } catch {
+    // Fallback regex parsing for malformed URLs
+    const m =
+      trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/) ??
+      trimmed.match(/[?&]v=([a-zA-Z0-9_-]{11})/) ??
+      trimmed.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+    if (m) id = m[1];
+  }
+
+  if (!id || !/^[a-zA-Z0-9_-]{11}$/.test(id)) return null;
+
+  let start: number | undefined;
+  if (timeParam) {
+    if (/^\d+$/.test(timeParam)) {
+      start = parseInt(timeParam, 10);
+    } else {
+      // "1h2m3s" / "2m30s" / "45s" forms
+      const h = timeParam.match(/(\d+)h/)?.[1];
+      const m = timeParam.match(/(\d+)m/)?.[1];
+      const s = timeParam.match(/(\d+)s/)?.[1];
+      const total =
+        (h ? parseInt(h, 10) * 3600 : 0) +
+        (m ? parseInt(m, 10) * 60 : 0) +
+        (s ? parseInt(s, 10) : 0);
+      if (total > 0) start = total;
+    }
+  }
+  return { id, start };
+}
+
+function YouTubeStoneFrame({ url, label }: { url: string; label: string }) {
+  const parsed = parseYouTube(url);
+
+  if (!parsed) {
+    return (
+      <div className="relative aspect-video overflow-hidden rounded-xl border border-line-soft bg-burgundy-ink">
+        <div className="grid h-full w-full place-items-center">
+          <p className="font-serif text-sm italic text-cream/60">
+            Video unavailable
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // youtube-nocookie + modestbranding + rel=0 keeps the player feeling
+  // hosted-by-OSC rather than a heavy external embed.
+  const params = new URLSearchParams({
+    rel: "0",
+    modestbranding: "1",
+    playsinline: "1",
+  });
+  if (parsed.start) params.set("start", String(parsed.start));
+
+  const src = `https://www.youtube-nocookie.com/embed/${parsed.id}?${params.toString()}`;
+
+  return (
+    <div className="relative">
+      <div className="relative aspect-video overflow-hidden rounded-xl border border-line-soft bg-burgundy-ink shadow-[0_24px_50px_-28px_rgba(63,16,25,0.35)]">
+        <iframe
+          src={src}
+          title={label}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          className="absolute inset-0 h-full w-full"
+        />
+      </div>
+      {/* Editorial corner ornaments — match the rest of the brand */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-3 -top-3 h-5 w-5 border-l border-t border-gold-light/55"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-3 -bottom-3 h-5 w-5 border-b border-r border-gold-light/55"
+      />
     </div>
   );
 }

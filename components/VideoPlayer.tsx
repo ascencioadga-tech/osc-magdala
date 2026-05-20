@@ -26,11 +26,14 @@ export function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
+  // Default to unmuted so the first click plays both video and audio.
+  const [muted, setMuted] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [buffered, setBuffered] = useState(0); // 0–100 %
   const [fullscreen, setFullscreen] = useState(false);
+  const [scrubbing, setScrubbing] = useState(false);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -38,22 +41,32 @@ export function VideoPlayer({
 
     const onTimeUpdate = () => setCurrentTime(v.currentTime);
     const onLoadedMetadata = () => setDuration(v.duration || 0);
+    const onDurationChange = () => setDuration(v.duration || 0);
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
     const onVolumeChange = () => setMuted(v.muted);
+    const onProgress = () => {
+      if (!v.duration || !v.buffered.length) return;
+      const end = v.buffered.end(v.buffered.length - 1);
+      setBuffered(Math.min(100, (end / v.duration) * 100));
+    };
 
     v.addEventListener("timeupdate", onTimeUpdate);
     v.addEventListener("loadedmetadata", onLoadedMetadata);
+    v.addEventListener("durationchange", onDurationChange);
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     v.addEventListener("volumechange", onVolumeChange);
+    v.addEventListener("progress", onProgress);
 
     return () => {
       v.removeEventListener("timeupdate", onTimeUpdate);
       v.removeEventListener("loadedmetadata", onLoadedMetadata);
+      v.removeEventListener("durationchange", onDurationChange);
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("volumechange", onVolumeChange);
+      v.removeEventListener("progress", onProgress);
     };
   }, []);
 
@@ -88,12 +101,40 @@ export function VideoPlayer({
     v.muted = !v.muted;
   };
 
-  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const seekAt = (clientX: number, rect: DOMRect) => {
     const v = videoRef.current;
     if (!v || !duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
+    const ratio = Math.max(
+      0,
+      Math.min(1, (clientX - rect.left) / rect.width),
+    );
     v.currentTime = ratio * duration;
+  };
+
+  const seekRef = useRef<HTMLDivElement>(null);
+
+  const onSeekPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const el = seekRef.current;
+    if (!el) return;
+    el.setPointerCapture(e.pointerId);
+    setScrubbing(true);
+    seekAt(e.clientX, el.getBoundingClientRect());
+  };
+  const onSeekPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!scrubbing) return;
+    e.stopPropagation();
+    const el = seekRef.current;
+    if (!el) return;
+    seekAt(e.clientX, el.getBoundingClientRect());
+  };
+  const onSeekPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const el = seekRef.current;
+    if (el?.hasPointerCapture(e.pointerId)) {
+      el.releasePointerCapture(e.pointerId);
+    }
+    setScrubbing(false);
   };
 
   const toggleFullscreen = async () => {
@@ -142,7 +183,10 @@ export function VideoPlayer({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const showOverlay = !playing;
-  const showControls = hovered || !playing;
+  // Always keep controls visible while scrubbing so the pointer doesn't lose
+  // the bar if the user drags slightly outside the controls region.
+  const showControls = hovered || !playing || scrubbing;
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
   return (
     <div
@@ -158,12 +202,15 @@ export function VideoPlayer({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* No autoPlay — the visitor's click on the play overlay is what
+          starts the video, and (since `muted` is bound to state and defaults
+          to false) plays audio along with it. */}
       <video
         ref={videoRef}
-        autoPlay
         loop
-        muted
+        muted={muted}
         playsInline
+        preload="metadata"
         poster={poster}
         className="h-full w-full cursor-pointer object-cover"
         aria-label={label}
@@ -201,37 +248,83 @@ export function VideoPlayer({
         ) : null}
       </AnimatePresence>
 
+      {/* Top-left label strip — visible alongside the controls */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -6 }}
+        transition={{ duration: 0.25 }}
+        className="pointer-events-none absolute inset-x-0 top-0"
+      >
+        <div className="bg-gradient-to-b from-burgundy-ink/70 via-burgundy-ink/15 to-transparent px-4 pb-12 pt-3 md:px-6 md:pb-14 md:pt-4">
+          <div className="flex items-center gap-2 text-cream/90">
+            <span aria-hidden="true" className="block h-px w-6 bg-gold-light" />
+            <span className="text-[10px] uppercase tracking-[0.28em] md:text-[11px]">
+              {label}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Bottom controls bar */}
       <motion.div
         initial={false}
         animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : 6 }}
         transition={{ duration: 0.25 }}
-        className="pointer-events-none absolute inset-x-0 bottom-0"
+        className={[
+          "absolute inset-x-0 bottom-0",
+          showControls ? "pointer-events-auto" : "pointer-events-none",
+        ].join(" ")}
+        onClick={stop}
       >
         <div className="bg-gradient-to-t from-burgundy-ink/85 via-burgundy-ink/45 to-transparent px-4 pb-4 pt-10 md:px-6 md:pb-5 md:pt-14">
-          {/* Progress bar */}
+          {/* Seek hit zone — generous vertical padding so the bar is easy
+              to click; pointer-capture handles drag-to-scrub. */}
           <div
-            className="pointer-events-auto h-1.5 cursor-pointer rounded-full bg-cream/20 transition hover:h-2"
-            onClick={seek}
+            ref={seekRef}
+            className="group/seek relative cursor-pointer py-2.5 select-none"
+            onPointerDown={onSeekPointerDown}
+            onPointerMove={onSeekPointerMove}
+            onPointerUp={onSeekPointerUp}
+            onPointerCancel={onSeekPointerUp}
+            onClick={stop}
             role="slider"
-            tabIndex={-1}
+            tabIndex={0}
             aria-label="Seek"
             aria-valuenow={Math.round(progress)}
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            <div
-              className="h-full rounded-full bg-gold-light"
-              style={{ width: `${progress}%` }}
-            />
+            {/* Track */}
+            <div className="relative h-1.5 rounded-full bg-cream/20 transition-[height] group-hover/seek:h-2">
+              {/* Buffered indicator */}
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-cream/30"
+                style={{ width: `${buffered}%` }}
+              />
+              {/* Played indicator */}
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-gold-light"
+                style={{ width: `${progress}%` }}
+              />
+              {/* Scrub handle */}
+              <div
+                className={[
+                  "absolute top-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-cream shadow-[0_2px_6px_rgba(0,0,0,0.45)] ring-2 ring-burgundy-deep/55 transition-opacity",
+                  scrubbing
+                    ? "opacity-100"
+                    : "opacity-0 group-hover/seek:opacity-100",
+                ].join(" ")}
+                style={{ left: `calc(${progress}% - 7px)` }}
+              />
+            </div>
           </div>
 
           {/* Buttons row */}
-          <div className="pointer-events-auto mt-3 flex items-center justify-between text-cream">
+          <div className="mt-2 flex items-center justify-between text-cream">
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={togglePlay}
+                onClick={(e) => { stop(e); togglePlay(); }}
                 aria-label={playing ? "Pause" : "Play"}
                 className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-cream/15"
               >
@@ -245,7 +338,7 @@ export function VideoPlayer({
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={toggleMute}
+                onClick={(e) => { stop(e); toggleMute(); }}
                 aria-label={muted ? "Unmute" : "Mute"}
                 className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-cream/15"
               >
@@ -253,7 +346,7 @@ export function VideoPlayer({
               </button>
               <button
                 type="button"
-                onClick={toggleFullscreen}
+                onClick={(e) => { stop(e); toggleFullscreen(); }}
                 aria-label={fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                 className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-cream/15"
               >

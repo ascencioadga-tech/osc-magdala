@@ -44,3 +44,9 @@ next-env.d.ts
 AGENTS.md
 CLAUDE.md
 .claude/
+
+# Internal ADGA Solutions billing/quote docs — never publish to the site repo
+QUOTE.html
+QUOTE.md
+osc-quote.pdf
+adga-mark.svg

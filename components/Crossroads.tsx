@@ -65,7 +65,9 @@ export function Crossroads() {
             <VideoPlayer
               src="/osc-intro.mp4"
               type="video/mp4"
+              poster="/osc-intro-poster.jpg"
               label="One Step Closer intro video"
+              className="rounded-xl border border-cream/15 shadow-[0_24px_60px_-25px_rgba(0,0,0,0.55)]"
             />
             <span
               aria-hidden="true"
