@@ -373,17 +373,6 @@ function StoneButton({
         </svg>
       </span>
 
-      {/* One-liner appears on hover/active */}
-      <span
-        className={[
-          "font-serif mt-4 max-w-[15rem] text-center text-sm italic leading-snug transition",
-          isActive
-            ? "text-burgundy opacity-100"
-            : "text-ink/65 opacity-0 group-hover:opacity-100",
-        ].join(" ")}
-      >
-        {stone.oneLine}
-      </span>
     </motion.button>
   );
 }

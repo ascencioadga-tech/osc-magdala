@@ -76,17 +76,17 @@ export function Hero() {
 
       <motion.div
         style={{ opacity: contentOpacity, y: contentY }}
-        className="mx-auto flex min-h-[100vh] max-w-7xl flex-col justify-end px-6 pb-24 pt-32 text-cream md:px-10 md:pb-32 md:pt-40"
+        className="mx-auto flex min-h-[100vh] max-w-7xl flex-col justify-end px-6 pb-24 pt-32 text-cream md:px-10 md:pb-32 md:pt-40 lg:justify-center"
       >
-        <div className="grid items-start gap-10 md:grid-cols-[1.5fr_1fr] md:gap-16">
-          <div className="max-w-4xl">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,5fr)_7fr] lg:gap-12 xl:gap-16">
+          <div className="max-w-2xl lg:max-w-none">
             {/* Italic tagline — now the primary headline */}
             <motion.h1
               variants={fadeUp}
               initial="hidden"
               animate="show"
               transition={{ duration: 0.95, delay: 0.2, ease: reverentEase }}
-              className="font-serif text-[44px] italic leading-[1.05] tracking-tight text-cream md:text-[80px] lg:text-[96px]"
+              className="font-serif text-[40px] italic leading-[1.05] tracking-tight text-cream md:text-[68px] lg:text-[54px] xl:text-[64px]"
             >
               {hero.tagline}
             </motion.h1>
@@ -144,19 +144,19 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Right rail — Fr. Juan video */}
+          {/* Fr. Juan video — right column, maximized within its track */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             animate="show"
-            transition={{ duration: 0.9, delay: 2.1, ease: reverentEase }}
-            className="md:pb-2"
+            transition={{ duration: 0.9, delay: 0.55, ease: reverentEase }}
+            className="mt-12 w-full lg:mt-0"
           >
-            <p className="eyebrow hidden text-gold-light/85 md:block">
+            <p className="eyebrow text-center text-gold-light/85 lg:text-left">
               Magdala · Sea of Galilee
             </p>
 
-            <div className="mt-5 md:mt-6">
+            <div className="mt-4 md:mt-5">
               <VideoPlayer
                 src="/fr-juan-osc.mp4"
                 type="video/mp4"
@@ -166,7 +166,7 @@ export function Hero() {
               />
             </div>
 
-            <p className="font-serif mt-4 text-sm italic text-cream/75 md:text-base">
+            <p className="font-serif mt-4 text-center text-sm italic text-cream/75 md:text-base lg:text-left">
               Fr. Juan Solana, founder of Magdala — on the vision of One Step
               Closer.
             </p>
