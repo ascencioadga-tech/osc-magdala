@@ -10,7 +10,7 @@ export const hero = {
   title: "One Step Closer",
   tagline: "What starts at the Sea of Galilee goes worldwide.",
   intro:
-    "An interdenominational initiative at Magdala — Christians of many traditions serving pilgrims together, so the world may believe.",
+    "Christians of many traditions serving pilgrims together, so the world may believe.",
   primaryCta: { label: "Join the Journey", href: "#take-a-step" },
   secondaryCta: { label: "Donate", href: "#donate" },
   attribution: "from magdala.org",
