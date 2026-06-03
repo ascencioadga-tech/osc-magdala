@@ -234,16 +234,28 @@ export function VideoPlayer({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             className="absolute inset-0 grid place-items-center bg-burgundy-ink/35 backdrop-blur-[1.5px] focus:outline-none"
-            aria-label="Play video"
+            aria-label={
+              duration > 0 ? `Play video (${fmt(duration)})` : "Play video"
+            }
           >
-            <motion.span
-              initial={{ scale: 0.85 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.35, ease: [0.22, 0.8, 0.32, 1] }}
-              className="grid h-16 w-16 place-items-center rounded-full bg-cream text-burgundy shadow-[0_8px_24px_rgba(0,0,0,0.45)] ring-1 ring-gold-light/50 transition-transform group-hover:scale-105 md:h-20 md:w-20"
-            >
-              <PlayIcon className="ml-[2px] h-7 w-7 md:h-8 md:w-8" />
-            </motion.span>
+            <div className="flex flex-col items-center gap-3">
+              <motion.span
+                initial={{ scale: 0.85 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.35, ease: [0.22, 0.8, 0.32, 1] }}
+                className="grid h-16 w-16 place-items-center rounded-full bg-cream text-burgundy shadow-[0_8px_24px_rgba(0,0,0,0.45)] ring-1 ring-gold-light/50 transition-transform group-hover:scale-105 md:h-20 md:w-20"
+              >
+                <PlayIcon className="ml-[2px] h-7 w-7 md:h-8 md:w-8" />
+              </motion.span>
+              {duration > 0 ? (
+                <span
+                  className="eyebrow text-[10px] text-cream/90"
+                  style={{ textShadow: "0 1px 6px rgba(0,0,0,0.55)" }}
+                >
+                  {fmt(duration)}
+                </span>
+              ) : null}
+            </div>
           </motion.button>
         ) : null}
       </AnimatePresence>

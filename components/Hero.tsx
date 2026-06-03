@@ -150,7 +150,7 @@ export function Hero() {
             initial="hidden"
             animate="show"
             transition={{ duration: 0.9, delay: 0.55, ease: reverentEase }}
-            className="mt-12 w-full lg:mt-0"
+            className="mt-12 w-full lg:mt-0 lg:max-w-[82%] lg:ml-auto"
           >
             <p className="eyebrow text-center text-gold-light/85 lg:text-left">
               Magdala · Sea of Galilee
@@ -183,8 +183,21 @@ export function Hero() {
         className="pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 md:block"
         aria-hidden="true"
       >
-        <span className="eyebrow text-[10px] text-cream/55">Scroll</span>
-        <span className="mx-auto mt-2 block h-10 w-px origin-top animate-scroll-cue bg-cream/45" />
+        <span className="eyebrow text-[10px] text-cream/55">Scroll Down</span>
+        <motion.svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mx-auto mt-2 h-5 w-5 text-cream/60"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <path d="M6 9l6 6 6-6" />
+        </motion.svg>
       </motion.div>
     </motion.section>
   );

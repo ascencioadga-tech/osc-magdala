@@ -207,7 +207,7 @@ export const takeAStep = {
       key: "denominations",
       title: "For Partner Denominations",
       body: "Bring your tradition into the shared work. We welcome formal partnerships with churches and communities ready to send volunteers, artists, and clergy.",
-      cta: { label: "Partner with us", href: "mailto:partners@onestepcloser.org" },
+      cta: { label: "Partner with us", href: "/partners" },
     },
     {
       key: "pilgrims",
