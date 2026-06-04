@@ -45,6 +45,8 @@ export type Stone = {
     width: number;
     height: number;
   }[];
+  /** Optional dropdown of further detail; the CTA becomes a toggle. */
+  expand?: { heading: string; bullets: string[] };
 };
 
 export const stones: Stone[] = [
@@ -53,8 +55,21 @@ export const stones: Stone[] = [
     label: "Restaurant",
     oneLine: "The kickoff — a restaurant at Magdala, built and run together.",
     title: "A restaurant at Magdala, built together",
-    body: "The inaugural shot of One Step Closer: a restaurant at Magdala, built and run by Christians of many denominations. Pilgrims share meals and fellowship; the witness begins at table.",
-    cta: { label: "Help build the restaurant", href: "#donate" },
+    body: "Christians from various confessions of faith build a restaurant together as an irrefutable monument to Christ’s oneness prayer motivating us all to continue responding 2000 years later.",
+    cta: { label: "Learn More", href: "#" },
+    expand: {
+      heading: "Building the Restaurant Together",
+      bullets: [
+        "is an undeniable proof and an irresistible proclamation that we have embarked on a new walk together to help the hungry, thirsty, tired and exhausted by brokenness",
+        "is the death to all our rancor, division and hatred, judgmental attitudes, exclusion, antipathies, and hostilities",
+        "is the Pentecost-like resurrection of charity, collaboration, mutual appreciation, fruits of the Holy Spirit",
+        "is like the Super Bowl ad, which powerfully permanently floats the idea to tens of thousands of visitors that such an unbelievable and unimaginable phenomenon has become a reality, we did it together!",
+        "is the flagship of a worldwide process of One Step Closer, overcoming the far too prevalent anti-culture of division, exclusion, judgmental condemnation, and cancellation, which negates the existence of those who express a different opinion",
+        "helps overcome, by God’s grace, the all-too-prevalent defeatism that Christian division is unsurmountable.",
+        "is a powerful call to action everywhere, locally, where all visitors return home: The Restaurant accomplished together in Galilee kickstarts a worldwide process!",
+        "is a Super-Bowl advertisement that doesn’t replace the hard-work of developing the product, producing, and delivering it. But what’s the chances of the product’s success without the Super Bowl ad? Let’s go to work together!",
+      ],
+    },
     images: [
       {
         src: "/restaurant/restaurant-1.jpg",

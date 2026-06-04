@@ -853,48 +853,131 @@ function FootprintIcon({ size = 14 }: { size?: number }) {
 // ─── Active stone panel ───────────────────────────────────────────────
 
 function StonePanel({ stone }: { stone: StoneData }) {
+  const [expanded, setExpanded] = useState(false);
+  const panelId = `stone-${stone.number}-expand`;
+  const hasExpand = Boolean(stone.expand);
+
   return (
-    <div className="grid items-center gap-10 rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,16,25,0.25)] md:grid-cols-[1.1fr_1fr] md:p-12">
-      <div>
-        <p className="eyebrow text-terracotta">
-          Stone {stone.number} · {stone.label}
-        </p>
-        <h3 className="font-display mt-4 text-3xl leading-tight text-burgundy md:text-[40px]">
-          {stone.title}
-        </h3>
-        <p className="mt-5 text-base leading-relaxed text-ink/85 md:text-lg">
-          {stone.body}
-        </p>
-        <Link
-          href={stone.cta.href}
-          className="mt-7 inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
-        >
-          {stone.cta.label} <span aria-hidden="true">→</span>
-        </Link>
-      </div>
-      {stone.youtube ? (
-        <YouTubeStoneFrame
-          url={stone.youtube}
-          label={`Stone ${stone.number} — ${stone.label} video`}
-        />
-      ) : stone.video ? (
-        <VideoPlayer
-          src={stone.video}
-          type="video/mp4"
-          label={`Stone ${stone.number} — ${stone.label} video`}
-        />
-      ) : stone.images && stone.images.length > 0 ? (
-        <StoneCarousel
-          images={stone.images}
-          label={`Stone ${stone.number} — ${stone.label}`}
-        />
-      ) : (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-sand">
-          <PhotoPlaceholder
-            label={`Photo · Stone ${stone.number} · ${stone.label}`}
-          />
+    <div className="rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,16,25,0.25)] md:p-12">
+      <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
+        <div>
+          <p className="eyebrow text-terracotta">
+            Stone {stone.number} · {stone.label}
+          </p>
+          <h3 className="font-display mt-4 text-3xl leading-tight text-burgundy md:text-[40px]">
+            {stone.title}
+          </h3>
+          <p className="mt-5 text-base leading-relaxed text-ink/85 md:text-lg">
+            {stone.body}
+          </p>
+
+          {hasExpand ? (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              aria-expanded={expanded}
+              aria-controls={panelId}
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
+            >
+              {expanded ? "Show less" : stone.cta.label}
+              <motion.span
+                aria-hidden="true"
+                animate={{ rotate: expanded ? 180 : 0 }}
+                transition={{ duration: 0.4, ease: reverentEase }}
+                className="inline-block"
+              >
+                ↓
+              </motion.span>
+            </button>
+          ) : (
+            <Link
+              href={stone.cta.href}
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
+            >
+              {stone.cta.label} <span aria-hidden="true">→</span>
+            </Link>
+          )}
         </div>
-      )}
+
+        {stone.youtube ? (
+          <YouTubeStoneFrame
+            url={stone.youtube}
+            label={`Stone ${stone.number} — ${stone.label} video`}
+          />
+        ) : stone.video ? (
+          <VideoPlayer
+            src={stone.video}
+            type="video/mp4"
+            label={`Stone ${stone.number} — ${stone.label} video`}
+          />
+        ) : stone.images && stone.images.length > 0 ? (
+          <StoneCarousel
+            images={stone.images}
+            label={`Stone ${stone.number} — ${stone.label}`}
+          />
+        ) : (
+          <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-sand">
+            <PhotoPlaceholder
+              label={`Photo · Stone ${stone.number} · ${stone.label}`}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Expandable detail — full-width below the grid; bullets stagger in. */}
+      <AnimatePresence initial={false}>
+        {expanded && stone.expand ? (
+          <motion.div
+            key={panelId}
+            id={panelId}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.6, ease: reverentEase }}
+            className="overflow-hidden"
+          >
+            <div className="mt-10 border-t border-line-soft pt-8">
+              <div className="flex items-center gap-3">
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{
+                    duration: 0.6,
+                    delay: 0.1,
+                    ease: reverentEase,
+                  }}
+                  className="block h-px w-10 origin-left bg-gold"
+                />
+                <p className="font-display text-2xl text-burgundy md:text-[30px]">
+                  {stone.expand.heading}
+                </p>
+              </div>
+
+              <ul className="mt-6 space-y-4">
+                {stone.expand.bullets.map((b, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.55,
+                      delay: 0.16 + i * 0.09,
+                      ease: reverentEase,
+                    }}
+                    className="font-serif relative pl-7 text-base leading-[1.7] text-ink/85 md:text-lg"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 top-[0.6em] block h-1.5 w-1.5 rotate-45 bg-gold"
+                    />
+                    {b}
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

@@ -59,6 +59,23 @@ export function VideoPlayer({
     v.addEventListener("volumechange", onVolumeChange);
     v.addEventListener("progress", onProgress);
 
+    // Pick up duration if metadata was loaded before listeners attached.
+    if (
+      v.readyState >= 1 &&
+      Number.isFinite(v.duration) &&
+      v.duration > 0
+    ) {
+      setDuration(v.duration);
+    } else if (v.readyState === 0) {
+      // Some browsers ignore preload="metadata" until told to load — nudge
+      // it so the duration appears without waiting for the visitor's click.
+      try {
+        v.load();
+      } catch {
+        /* ignore */
+      }
+    }
+
     return () => {
       v.removeEventListener("timeupdate", onTimeUpdate);
       v.removeEventListener("loadedmetadata", onLoadedMetadata);
@@ -91,8 +108,22 @@ export function VideoPlayer({
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) v.play();
-    else v.pause();
+    if (v.paused) {
+      const p = v.play();
+      if (p && typeof p.then === "function") {
+        p.catch(() => {
+          // Some browsers (and embedded preview iframes) block unmuted
+          // autoplay even after a click. Retry muted so the visitor's tap
+          // is never a dead-end; they can unmute from the controls.
+          v.muted = true;
+          v.play().catch(() => {
+            /* genuinely unplayable — leave the overlay in place */
+          });
+        });
+      }
+    } else {
+      v.pause();
+    }
   };
 
   const toggleMute = () => {
