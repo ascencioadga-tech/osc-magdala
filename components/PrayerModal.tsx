@@ -55,9 +55,9 @@ export function PrayerModal({ open, onClose }: PrayerModalProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.45, ease: reverentEase }}
-            className="relative max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-line-soft bg-parchment p-8 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.55)] md:max-w-2xl md:p-12"
+            className="relative max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.55)] md:max-w-2xl md:p-12"
           >
-            {/* Top ornament */}
+            {/* Heading */}
             <div className="text-center">
               <span aria-hidden="true" className="text-2xl text-gold">
                 ✦
@@ -82,7 +82,7 @@ export function PrayerModal({ open, onClose }: PrayerModalProps) {
               ))}
             </div>
 
-            {/* Bottom ornament + Amen */}
+            {/* Amen */}
             <div className="mt-8 text-center">
               <span
                 aria-hidden="true"
@@ -91,7 +91,7 @@ export function PrayerModal({ open, onClose }: PrayerModalProps) {
               <p className="eyebrow mt-5 text-terracotta">Amen.</p>
             </div>
 
-            {/* Close button — top-right corner */}
+            {/* Close — top-right */}
             <button
               type="button"
               onClick={onClose}

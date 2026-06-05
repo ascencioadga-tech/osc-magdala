@@ -12,17 +12,14 @@ export function Prayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const inView = useInView(sectionRef, { amount: 0.25, margin: "-10% 0px" });
 
-  // The Prayer backdrop is ambient — it should be playing the moment the
-  // visitor reaches this section, and quietly pause when they leave so it
-  // never plays off-screen. Muted playback is permitted by browsers without
-  // a click.
+  // Ambient background video — plays (muted) while the section is on screen.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     if (inView) {
-      v.muted = true; // safety: ensure muted so autoplay is allowed
+      v.muted = true;
       v.play().catch(() => {
-        /* ignore autoplay rejections (e.g. low-power mode) */
+        /* ignore autoplay rejections */
       });
     } else {
       v.pause();
@@ -36,8 +33,7 @@ export function Prayer() {
         ref={sectionRef}
         className="relative isolate overflow-hidden"
       >
-        {/* Background video — Jon17 OSC. Plays automatically (muted) once the
-            section comes into view; pauses when it leaves. */}
+        {/* Background video */}
         <div className="absolute inset-0 -z-10">
           <video
             ref={videoRef}
@@ -61,28 +57,34 @@ export function Prayer() {
           />
         </div>
 
-        {/* Bottom-left anchored button */}
-        <div className="mx-auto flex min-h-[70vh] max-w-7xl items-end px-6 pb-10 pt-24 md:px-10 md:pb-16 md:pt-32">
-          <motion.button
-            type="button"
-            onClick={() => setOpen(true)}
-            initial={{ opacity: 0, y: 14 }}
+        {/* Bottom-left anchored invitation */}
+        <div className="mx-auto flex min-h-[70vh] max-w-7xl items-end px-6 pb-12 pt-24 md:px-10 md:pb-16 md:pt-32">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.7, ease: reverentEase }}
-            className="group/cta inline-flex items-center gap-3 rounded-full bg-cream px-7 py-3.5 text-sm font-medium tracking-wide text-burgundy transition hover:bg-gold hover:text-burgundy-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-light focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy-ink"
+            transition={{ duration: 0.8, ease: reverentEase }}
           >
-            <span aria-hidden="true" className="text-gold-deep">
-              ✦
-            </span>
-            OSC Prayer
-            <span
-              aria-hidden="true"
-              className="transition-transform group-hover/cta:translate-x-0.5"
+            <p className="eyebrow mb-4 text-gold-light/90">
+              A Prayer for Oneness · John&nbsp;17
+            </p>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="group inline-flex items-center gap-3 rounded-full border border-cream/40 bg-cream/5 px-7 py-3.5 text-sm font-medium tracking-wide text-cream backdrop-blur-sm transition hover:border-cream/80 hover:bg-cream/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-light focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
-              →
-            </span>
-          </motion.button>
+              <span aria-hidden="true" className="text-gold-light">
+                ✦
+              </span>
+              Read the OSC Prayer
+              <span
+                aria-hidden="true"
+                className="transition-transform group-hover:translate-x-0.5"
+              >
+                →
+              </span>
+            </button>
+          </motion.div>
         </div>
       </section>
 
