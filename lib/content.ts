@@ -69,7 +69,7 @@ export const stones: Stone[] = [
     oneLine: "The kickoff — a restaurant at Magdala, built and run together.",
     title: "More than a restaurant",
     subtitle: "Building together a living sign of John 17",
-    body: "Christians from various confessions of faith build a restaurant together as an irrefutable monument to Christ’s oneness prayer motivating us all to continue responding 2000 years later.",
+    body: "Jesus’ prayer for oneness still calls us forward. Built together by Christians from diverse traditions, the Restaurant Built Together witnesses permanently to John 17:20–23 — a monument to Christ’s prayer and a landmark beckoning us onward, renewed, one step closer in Christ.",
     cta: { label: "Learn More", href: "#" },
     expand: {
       sections: [
@@ -121,18 +121,37 @@ export const stones: Stone[] = [
           blocks: [
             {
               paragraph:
-                "The restaurant will speak silently to every guest who enters:",
+                "At Magdala, the Restaurant Built Together invites guests to experience Jesus’ prayer for oneness through hospitality.",
+            },
+            {
+              paragraph:
+                "Taste and see that the Lord is good! A good meal, a beautiful Sea of Galilee setting, gracious company as we meet each other and share blessings.",
             },
             {
               bullets: [
-                "It was built together by Christians from diverse traditions.",
-                "It serves as a place where hospitality becomes witness.",
-                "It invites every visitor to carry this same spirit home.",
+                "Gracious volunteers welcoming you, attentive to your needs. Diligent staff pouring out the Lord’s bounty.",
+                "Pastors’ tables where the experiences of different Christian traditions and challenges enrich and strengthen each other.",
+                "Lakeside dinners where One Step Closer churches mingle and share blessings they will take back to their communities.",
+                "Spontaneous Magdala table encounters which stimulate us all in our walk with Jesus.",
               ],
             },
             {
               paragraph:
-                "The restaurant will welcome the hungry, the thirsty, the tired, the pilgrim, the visitor, and the exhausted who experience a tangible sign that inherited prejudice can give way to friendship, and a school of oneness where hospitality becomes a pathway toward reconciliation.",
+                "The restaurant welcomes the hungry, the thirsty, the tired, the pilgrim, the visitor, and all who carry burdens of brokenness. In this school of oneness, Christians learn, step by step, to serve together in response to Christ’s prayer: “That they may all be one.”",
+            },
+            {
+              paragraph:
+                "Our hope is that our guests leave with one conviction:",
+            },
+            {
+              bullets: [
+                "We built together.",
+                "We serve together.",
+                "We are learning, by the grace of the Holy Spirit, to keep walking one step closer in Christ.",
+              ],
+            },
+            {
+              paragraph: "So, let’s take this spirit home!",
             },
           ],
         },
