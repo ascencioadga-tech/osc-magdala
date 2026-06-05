@@ -27,7 +27,11 @@ export type Stone = {
   label: string;
   oneLine: string;
   title: string;
-  body: string;
+  /** Optional softer line shown beneath the panel title. */
+  subtitle?: string;
+  body?: string;
+  /** Structured panel body — when present, rendered instead of `body`. */
+  bodyBlocks?: ({ paragraph: string } | { bullets: string[] })[];
   cta: { label: string; href: string };
   /** Optional video for the expanded panel (autoplay-loop-muted with full controls) */
   video?: string;
@@ -45,8 +49,17 @@ export type Stone = {
     width: number;
     height: number;
   }[];
-  /** Optional dropdown of further detail; the CTA becomes a toggle. */
-  expand?: { heading: string; bullets: string[] };
+  /** Optional dropdown of further detail; the CTA becomes a toggle.
+      Each section is rendered as an animated block with its own heading
+      and an ordered list of paragraphs / bulleted lists. */
+  expand?: {
+    sections: {
+      heading: string;
+      /** Short label used by the chip navigation (falls back to heading). */
+      label?: string;
+      blocks: ({ paragraph: string } | { bullets: string[] })[];
+    }[];
+  };
 };
 
 export const stones: Stone[] = [
@@ -54,20 +67,75 @@ export const stones: Stone[] = [
     number: 1,
     label: "Restaurant",
     oneLine: "The kickoff — a restaurant at Magdala, built and run together.",
-    title: "A restaurant at Magdala, built together",
+    title: "More than a restaurant",
+    subtitle: "Building together a living sign of John 17",
     body: "Christians from various confessions of faith build a restaurant together as an irrefutable monument to Christ’s oneness prayer motivating us all to continue responding 2000 years later.",
     cta: { label: "Learn More", href: "#" },
     expand: {
-      heading: "Building the Restaurant Together",
-      bullets: [
-        "is an undeniable proof and an irresistible proclamation that we have embarked on a new walk together to help the hungry, thirsty, tired and exhausted by brokenness",
-        "is the death to all our rancor, division and hatred, judgmental attitudes, exclusion, antipathies, and hostilities",
-        "is the Pentecost-like resurrection of charity, collaboration, mutual appreciation, fruits of the Holy Spirit",
-        "is like the Super Bowl ad, which powerfully permanently floats the idea to tens of thousands of visitors that such an unbelievable and unimaginable phenomenon has become a reality, we did it together!",
-        "is the flagship of a worldwide process of One Step Closer, overcoming the far too prevalent anti-culture of division, exclusion, judgmental condemnation, and cancellation, which negates the existence of those who express a different opinion",
-        "helps overcome, by God’s grace, the all-too-prevalent defeatism that Christian division is unsurmountable.",
-        "is a powerful call to action everywhere, locally, where all visitors return home: The Restaurant accomplished together in Galilee kickstarts a worldwide process!",
-        "is a Super-Bowl advertisement that doesn’t replace the hard-work of developing the product, producing, and delivering it. But what’s the chances of the product’s success without the Super Bowl ad? Let’s go to work together!",
+      sections: [
+        {
+          label: "Living Monument",
+          heading: "A Living Monument to Jesus’ Oneness Prayer (John 17)",
+          blocks: [
+            {
+              paragraph:
+                "At the Last Supper, Jesus prayed for all who would believe in him, “that they may all be one” (John 17:20–23). At Magdala, One Step Closer – Hospitality Together gives that prayer a visible and practical form.",
+            },
+            {
+              paragraph:
+                "Christians from diverse traditions are building this restaurant together.",
+            },
+            { paragraph: "That fact is the message." },
+            {
+              paragraph:
+                "Before the first meal is served, the restaurant already proclaims something simple and powerful: by God’s grace, disciples of Jesus, still marked by centuries of division, can move from inherited prejudice to friendship, from rivalry to partnership, and from separation to shared service.",
+            },
+          ],
+        },
+        {
+          label: "Training Ground",
+          heading:
+            "A training ground for OSC-HT volunteers to grow closer together",
+          blocks: [
+            {
+              paragraph:
+                "The restaurant will speak silently to every volunteer who offers hospitality:",
+            },
+            {
+              bullets: [
+                "Christians built this together.",
+                "Christians can serve together.",
+                "Christians can return home and continue working together.",
+              ],
+            },
+            {
+              paragraph:
+                "Volunteers from different Christian traditions serving together learn and practice the spirit of oneness for which Jesus prayed.",
+            },
+          ],
+        },
+        {
+          label: "Oasis of Togetherness",
+          heading:
+            "An oasis of togetherness to experience Jesus’ Oneness Prayer through hospitality",
+          blocks: [
+            {
+              paragraph:
+                "The restaurant will speak silently to every guest who enters:",
+            },
+            {
+              bullets: [
+                "It was built together by Christians from diverse traditions.",
+                "It serves as a place where hospitality becomes witness.",
+                "It invites every visitor to carry this same spirit home.",
+              ],
+            },
+            {
+              paragraph:
+                "The restaurant will welcome the hungry, the thirsty, the tired, the pilgrim, the visitor, and the exhausted who experience a tangible sign that inherited prejudice can give way to friendship, and a school of oneness where hospitality becomes a pathway toward reconciliation.",
+            },
+          ],
+        },
       ],
     },
     images: [
@@ -100,25 +168,153 @@ export const stones: Stone[] = [
     oneLine: "Volunteers from Catholic, Orthodox, and Reformation churches serving side by side.",
     title: "Volunteers serving side by side",
     body: "A shared volunteer program where Christians from different faith communities welcome pilgrims together. Mutual respect, real cooperation — hospitality as a sign of the unity we still hope for.",
-    cta: { label: "Volunteer with us", href: "#take-a-step" },
+    cta: { label: "Learn More", href: "#" },
     youtube: "https://www.youtube.com/watch?v=YTih2pqq7V4&t=4s",
+    expand: {
+      sections: [
+        {
+          label: "An Invitation",
+          heading: "An Invitation to Serve at Magdala",
+          blocks: [
+            {
+              paragraph:
+                "Since 2010, thousands of volunteers have blessed Magdala with a spirit of service. We now seek to extend this to our restaurant hospitality.",
+            },
+            {
+              paragraph:
+                "Our staff does great work, but hundreds of tired, thirsty, and hungry pilgrims deeply appreciate a personal welcome and touches of attention inspired by Jesus’ example.",
+            },
+            {
+              paragraph:
+                "We invite your Church to send volunteers regularly to serve pilgrims at Magdala for extended periods.",
+            },
+            {
+              paragraph:
+                "Learn more about our existing volunteer program at Magdala Volunteers.",
+            },
+          ],
+        },
+        {
+          label: "The Impact",
+          heading: "Renewed in Body, Mind, and Soul",
+          blocks: [
+            {
+              paragraph:
+                "Imagine the impact on those who come to dine at Magdala, leaving refreshed in body and renewed in mind and soul.",
+            },
+            {
+              paragraph:
+                "Volunteers, their families, and home Churches will be enriched by the experiences, promoting new waves of volunteers.",
+            },
+          ],
+        },
+        {
+          label: "Together",
+          heading: "One Step Closer, Across Traditions",
+          blocks: [
+            {
+              paragraph:
+                "Picture volunteers from different Christian faith communities serving Holy Land pilgrims together.",
+            },
+            {
+              paragraph:
+                "Despite our differences, we can provide hospitality together, impacting countless visitors, including those who are not Christians.",
+            },
+            {
+              paragraph:
+                "We aim to walk closer together, beyond prejudices and judgmental attitudes, heeding Jesus’ call, “Give them some food yourselves” (Matthew 14; Mark 6; Luke 9.)",
+            },
+            {
+              paragraph:
+                "Regardless of our Christian affiliations we can grow one step closer.",
+            },
+            {
+              paragraph:
+                "To date, around 3,000 volunteers from various Christian confessions have served in Magdala.",
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     number: 3,
     label: "Artwork",
     oneLine: "An iconic artwork of Christian unity rising in Galilee.",
     title: "An iconic artwork of unity",
-    body: "Sculptures and paintings — created by artists across traditions — that celebrate and teach Christian oneness. The artwork becomes a teaching place for the next generation of pilgrims.",
-    cta: { label: "Support the artwork", href: "#donate" },
+    bodyBlocks: [
+      {
+        paragraph:
+          "The artwork becomes a teaching place for the next generation of pilgrims.",
+      },
+      { paragraph: "Magdala is blessed by inspiring art." },
+      {
+        bullets: [
+          "Second Temple period mosaics, frescoes, sculpture, and architecture",
+          "21st century interpretations of Gospel texts in icons, paintings, mosaics, sculptures, architecture",
+        ],
+      },
+    ],
+    cta: { label: "Learn More", href: "#" },
+    expand: {
+      sections: [
+        {
+          label: "Call to Artists",
+          heading: "Call to artists",
+          blocks: [
+            {
+              paragraph:
+                "Expect a worldwide call to artists to submit proposals for the ambitious desire to see a major art piece presenting John 17:20–23 to the world.",
+            },
+          ],
+        },
+      ],
+    },
     video: "/artist.mp4",
   },
   {
     number: 4,
     label: "Worldwide",
     oneLine: "Pilgrims carry the encounter home — leaven for their neighborhoods.",
-    title: "Worldwide resonance",
-    body: "Visitors and volunteers return to families and churches changed. Encounter, mutual appreciation, and teamwork replace prejudice. Leaven from Galilee changes the world, one neighborhood at a time.",
-    cta: { label: "Bring it home", href: "#take-a-step" },
+    title: "Worldwide Resonance",
+    body: "From the shores of Galilee, OSC-HT invites churches, pastors, volunteers, pilgrims, and donors to carry this witness into their own communities: partnership over divisiveness, hospitality over hostility, and long-term friendship over inherited prejudice.",
+    cta: { label: "Learn More", href: "#" },
+    expand: {
+      sections: [
+        {
+          label: "Hearts Stirred",
+          heading: "Hearts Stirred Worldwide",
+          blocks: [
+            {
+              paragraph:
+                "One Step Closer already stirs many hearts throughout the world.",
+            },
+            {
+              paragraph:
+                "Visitors and volunteers return to families and churches changed.",
+            },
+            {
+              paragraph:
+                "Encounter, mutual appreciation, and teamwork replace prejudice.",
+            },
+          ],
+        },
+        {
+          label: "Leaven from Galilee",
+          heading: "Leaven Changes the World",
+          blocks: [
+            {
+              paragraph:
+                "Around the globe Christians from different churches in the same locality tackle together the ever new challenges facing the most needy.",
+            },
+            {
+              paragraph:
+                "Leaven from Galilee changes the world, one community at a time.",
+            },
+          ],
+        },
+      ],
+    },
   },
 ];
 

@@ -854,8 +854,12 @@ function FootprintIcon({ size = 14 }: { size?: number }) {
 
 function StonePanel({ stone }: { stone: StoneData }) {
   const [expanded, setExpanded] = useState(false);
+  const [sectionIndex, setSectionIndex] = useState(0);
   const panelId = `stone-${stone.number}-expand`;
   const hasExpand = Boolean(stone.expand);
+  const sectionCount = stone.expand?.sections.length ?? 0;
+  const safeIndex = Math.min(sectionIndex, Math.max(sectionCount - 1, 0));
+  const activeSection = stone.expand?.sections[safeIndex];
 
   return (
     <div className="rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,16,25,0.25)] md:p-12">
@@ -866,10 +870,38 @@ function StonePanel({ stone }: { stone: StoneData }) {
           </p>
           <h3 className="font-display mt-4 text-3xl leading-tight text-burgundy md:text-[40px]">
             {stone.title}
+            {stone.subtitle ? (
+              <span className="mt-1 block font-display text-2xl leading-tight text-burgundy/70 md:text-[28px]">
+                {stone.subtitle}
+              </span>
+            ) : null}
           </h3>
-          <p className="mt-5 text-base leading-relaxed text-ink/85 md:text-lg">
-            {stone.body}
-          </p>
+          {stone.bodyBlocks ? (
+            <div className="mt-5 space-y-3 text-base leading-relaxed text-ink/85 md:text-lg">
+              {stone.bodyBlocks.map((block, i) => {
+                if ("paragraph" in block) {
+                  return <p key={i}>{block.paragraph}</p>;
+                }
+                return (
+                  <ul key={i} className="space-y-2 pt-1">
+                    {block.bullets.map((b, j) => (
+                      <li key={j} className="relative pl-7">
+                        <span
+                          aria-hidden="true"
+                          className="absolute left-0 top-[0.65em] block h-1.5 w-1.5 rotate-45 bg-gold"
+                        />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })}
+            </div>
+          ) : stone.body ? (
+            <p className="mt-5 text-base leading-relaxed text-ink/85 md:text-lg">
+              {stone.body}
+            </p>
+          ) : null}
 
           {hasExpand ? (
             <button
@@ -937,43 +969,115 @@ function StonePanel({ stone }: { stone: StoneData }) {
             className="overflow-hidden"
           >
             <div className="mt-10 border-t border-line-soft pt-8">
-              <div className="flex items-center gap-3">
-                <motion.span
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: 0.1,
-                    ease: reverentEase,
-                  }}
-                  className="block h-px w-10 origin-left bg-gold"
-                />
-                <p className="font-display text-2xl text-burgundy md:text-[30px]">
-                  {stone.expand.heading}
-                </p>
-              </div>
+              <div className="space-y-7">
+                {/* Section chips — visitor steps through the dropdown */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {stone.expand.sections.map((s, i) => {
+                    const isActive = i === safeIndex;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setSectionIndex(i)}
+                        aria-pressed={isActive}
+                        className={[
+                          "rounded-full border px-4 py-1.5 text-[12px] font-medium tracking-wide transition",
+                          isActive
+                            ? "border-burgundy bg-burgundy text-cream shadow-[0_6px_18px_-8px_rgba(106,32,69,0.55)]"
+                            : "border-burgundy/25 text-burgundy/70 hover:border-burgundy/55 hover:text-burgundy",
+                        ].join(" ")}
+                      >
+                        <span className="mr-2 font-serif text-[11px] italic opacity-60">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        {s.label ?? s.heading}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <ul className="mt-6 space-y-4">
-                {stone.expand.bullets.map((b, i) => (
-                  <motion.li
-                    key={i}
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.55,
-                      delay: 0.16 + i * 0.09,
-                      ease: reverentEase,
-                    }}
-                    className="font-serif relative pl-7 text-base leading-[1.7] text-ink/85 md:text-lg"
+                {/* Active section — heading + blocks, crossfades on switch */}
+                <div className="relative">
+                  <AnimatePresence mode="wait">
+                    {activeSection ? (
+                      <motion.div
+                        key={safeIndex}
+                        initial={{ opacity: 0, x: 16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -16 }}
+                        transition={{ duration: 0.5, ease: reverentEase }}
+                      >
+                        <div className="flex items-baseline gap-4">
+                          <span className="font-serif text-sm italic text-gold/85">
+                            {ROMAN[safeIndex]}
+                          </span>
+                          <span
+                            aria-hidden="true"
+                            className="block h-px w-10 bg-gold"
+                          />
+                          <h4 className="font-display text-xl leading-tight text-burgundy md:text-[26px]">
+                            {activeSection.heading}
+                          </h4>
+                        </div>
+
+                        <div className="mt-5 space-y-4">
+                          {activeSection.blocks.map((block, bi) => {
+                            if ("paragraph" in block) {
+                              return (
+                                <p
+                                  key={bi}
+                                  className="font-serif text-base leading-[1.75] text-ink/85 md:text-lg"
+                                >
+                                  {block.paragraph}
+                                </p>
+                              );
+                            }
+                            return (
+                              <ul key={bi} className="space-y-3 pt-1">
+                                {block.bullets.map((item, ii) => (
+                                  <li
+                                    key={ii}
+                                    className="font-serif relative pl-7 text-base leading-[1.7] text-ink/85 md:text-lg"
+                                  >
+                                    <span
+                                      aria-hidden="true"
+                                      className="absolute left-0 top-[0.65em] block h-1.5 w-1.5 rotate-45 bg-gold"
+                                    />
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+
+                {/* Progress + next */}
+                <div className="flex items-center justify-between border-t border-burgundy/10 pt-4">
+                  <span className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
+                    {String(safeIndex + 1).padStart(2, "0")} /{" "}
+                    {String(sectionCount).padStart(2, "0")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSectionIndex((c) => (c + 1) % sectionCount)
+                    }
+                    className="group inline-flex items-center gap-2 text-sm font-medium text-burgundy/85 transition hover:text-terracotta"
                   >
+                    {safeIndex === sectionCount - 1 ? "Begin again" : "Next"}
                     <span
                       aria-hidden="true"
-                      className="absolute left-0 top-[0.6em] block h-1.5 w-1.5 rotate-45 bg-gold"
-                    />
-                    {b}
-                  </motion.li>
-                ))}
-              </ul>
+                      className="transition group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </button>
+                </div>
+              </div>
             </div>
           </motion.div>
         ) : null}
