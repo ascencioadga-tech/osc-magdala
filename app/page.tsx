@@ -2,6 +2,7 @@ import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Vision } from "@/components/Vision";
 import { SteppingStones } from "@/components/SteppingStones";
+import { OnenessStone } from "@/components/OnenessStone";
 import { Crossroads } from "@/components/Crossroads";
 import { OSCInAction } from "@/components/OSCInAction";
 import { Prayer } from "@/components/Prayer";
@@ -19,6 +20,7 @@ export default function Home() {
         <Vision />
         <SectionDivider />
         <SteppingStones />
+        <OnenessStone />
         <Crossroads />
         <OSCInAction />
         <Prayer />

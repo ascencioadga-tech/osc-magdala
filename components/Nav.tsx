@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { brand, nav } from "@/lib/content";
-import { Medallion } from "@/components/Logo";
+import { nav } from "@/lib/content";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -29,35 +28,9 @@ export function Nav() {
       ].join(" ")}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 md:px-10 md:py-4">
-        <Link
-          href="/"
-          className="flex items-center gap-4 group"
-          aria-label="One Step Closer — home"
-        >
-          <Medallion
-            size={96}
-            idPrefix="osc-nav"
-            className="drop-shadow-[0_8px_24px_rgba(42,8,16,0.55)] transition-transform duration-300 group-hover:scale-[1.04]"
-          />
-          <span className="flex flex-col leading-tight">
-            <span
-              className={[
-                "font-display text-xl transition-colors duration-300 md:text-2xl",
-                overHero ? "text-cream" : "text-burgundy",
-              ].join(" ")}
-            >
-              One Step Closer
-            </span>
-            <span
-              className={[
-                "eyebrow text-[10px] transition-colors duration-300 md:text-[11px]",
-                overHero ? "text-gold-light/90" : "text-terracotta",
-              ].join(" ")}
-            >
-              Hospitality · Together
-            </span>
-          </span>
-        </Link>
+        {/* Spacer — reserves the former brand lockup's footprint so the nav
+            height and the Donate CTA stay exactly where they were. */}
+        <span aria-hidden="true" className="block h-20 w-20 md:h-24 md:w-24" />
 
         <nav className="hidden items-center gap-7 md:flex">
           {nav.primary.map((item) => (

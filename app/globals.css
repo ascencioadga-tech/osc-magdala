@@ -165,6 +165,19 @@ body {
   animation: stone-hint 2.6s ease-out infinite;
 }
 
+/* The Oneness Stone millstone — the rock (with its inscribed name rings)
+   turns very slowly around the fixed center hub. transform-box: view-box
+   makes 50% 50% resolve to the SVG viewBox center (300, 310). */
+@keyframes oneness-rotate {
+  to { transform: rotate(360deg); }
+}
+.oneness-rotor {
+  animation: oneness-rotate 150s linear infinite;
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
 /* Slow Ken-Burns on the hero video — barely perceptible, frame stays alive */
 @keyframes hero-slow-zoom {
   0%   { transform: scale(1.04) translate3d(0, 0, 0); }
@@ -191,7 +204,8 @@ body {
   .hero-slow-zoom,
   .animate-scroll-cue,
   .water-shimmer,
-  .ripple-pulse {
+  .ripple-pulse,
+  .oneness-rotor {
     animation: none !important;
   }
 }

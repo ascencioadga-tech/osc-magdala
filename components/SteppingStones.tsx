@@ -51,8 +51,8 @@ export function SteppingStones() {
           transition={{ duration: 0.85, delay: 0.2, ease: reverentEase }}
           className="font-serif mt-5 max-w-xl text-xl italic leading-snug text-ink/75 md:text-2xl"
         >
-          Step on each stone to walk the path — from the first meal at Magdala
-          to the encounter carried home.
+          Step on each stone to walk the path — from acting on Jesus&rsquo;
+          Oneness Prayer in Galilee to living his Oneness at home.
         </motion.p>
       </div>
 

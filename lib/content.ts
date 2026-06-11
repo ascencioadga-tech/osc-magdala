@@ -310,11 +310,15 @@ export const stones: Stone[] = [
             },
             {
               paragraph:
-                "Visitors and volunteers return to families and churches changed.",
+                "Visitors and volunteers return to families and churches changed. Encounter, mutual appreciation, and teamwork replace prejudice.",
             },
             {
               paragraph:
-                "Encounter, mutual appreciation, and teamwork replace prejudice.",
+                "Pastors are sharing pulpits in their locality. One group of four pastors rotated through each other’s churches — each one preaching on John 17. Imagine the impact of four pastors from different churches in one locality, all emphasizing our needed response to Jesus’ Last Supper prayer.",
+            },
+            {
+              paragraph:
+                "Pastors report raising this theme at regional pastors’ conferences. What is the impact when entire communities are praying with Jesus for our oneness as his disciples, across all the churches of a given locality?",
             },
           ],
         },
