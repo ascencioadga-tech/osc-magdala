@@ -37,7 +37,7 @@ export function OSCInAction() {
       {/* Diagonal walking footsteps — looping, drifts top-left → bottom-right */}
       <FootstepsTrail />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20">
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -70,7 +70,7 @@ export function OSCInAction() {
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.85, delay: 0.35, ease: reverentEase }}
-          className="mt-12 md:mt-16"
+          className="mt-8 md:mt-10"
         >
           <div className="mx-auto max-w-5xl">
             {inAction.youtube ? (
@@ -99,12 +99,12 @@ export function OSCInAction() {
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 1, delay: 0.6, ease: reverentEase }}
-        className="relative z-10 mt-14 md:mt-20"
+        className="relative z-10 mt-10 md:mt-12"
       >
         <PolaroidWall images={inAction.images} />
       </motion.div>
 
-      <div className="relative z-10 pb-20 md:pb-28" />
+      <div className="relative z-10 pb-12 md:pb-16" />
     </section>
   );
 }
@@ -211,7 +211,7 @@ function PolaroidWall({
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-cream to-transparent md:w-40"
       />
 
-      <ul className="polaroid-marquee flex w-max items-center gap-6 py-8 group-hover/wall:[animation-play-state:paused] md:gap-8 md:py-12">
+      <ul className="polaroid-marquee flex w-max items-center gap-6 py-6 group-hover/wall:[animation-play-state:paused] md:gap-8 md:py-8">
         {reel.map((img, i) => {
           const idx = i % images.length;
           return (
