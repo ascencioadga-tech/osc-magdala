@@ -12,7 +12,7 @@ export const hero = {
   intro:
     "Christians of many traditions serving pilgrims together, so the world may believe.",
   primaryCta: { label: "Join the Journey", href: "#take-a-step" },
-  secondaryCta: { label: "Donate", href: "#donate" },
+  secondaryCta: { label: "Donate", href: "/benefactors" },
   attribution: "from magdala.org",
 };
 
@@ -466,5 +466,5 @@ export const nav = {
     { label: "Journal", href: "#journal" },
     { label: "Take a Step", href: "#take-a-step" },
   ],
-  cta: { label: "Donate", href: "#donate" },
+  cta: { label: "Donate", href: "/benefactors" },
 };
