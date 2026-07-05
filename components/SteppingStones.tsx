@@ -459,6 +459,15 @@ function StoneButton({
 
 /* Filled swell ribbons — the slow, deep layer. Ribbon edges repeat every
    300 units, so tiles join invisibly at x = 1200. */
+// Organic tone patches, pre-baked as seamlessly tiling images. The noise
+// is rasterized ONCE when the image decodes; drifting a bitmap is GPU-cheap,
+// unlike drifting a live turbulence filter (which re-rendered every frame
+// and tanked the water's frame rate in production).
+const ORGANIC_DARK =
+  "data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%271200%27%20height=%27240%27%3E%3Cfilter%20id=%27n%27%20x=%270%27%20y=%270%27%20width=%27100%%27%20height=%27100%%27%3E%3CfeTurbulence%20type=%27fractalNoise%27%20baseFrequency=%270.012%200.03%27%20numOctaves=%272%27%20seed=%2711%27%20stitchTiles=%27stitch%27/%3E%3CfeColorMatrix%20values=%270%200%200%200%200.13%200%200%200%200%200.27%200%200%200%200%200.36%200%200%200%200.5%20-0.06%27/%3E%3C/filter%3E%3Crect%20width=%271200%27%20height=%27240%27%20filter=%27url(%23n)%27/%3E%3C/svg%3E";
+const ORGANIC_LIGHT =
+  "data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%271200%27%20height=%27240%27%3E%3Cfilter%20id=%27n%27%20x=%270%27%20y=%270%27%20width=%27100%%27%20height=%27100%%27%3E%3CfeTurbulence%20type=%27fractalNoise%27%20baseFrequency=%270.012%200.03%27%20numOctaves=%272%27%20seed=%2729%27%20stitchTiles=%27stitch%27/%3E%3CfeColorMatrix%20values=%270%200%200%200%200.87%200%200%200%200%200.92%200%200%200%200%200.95%200%200%200%200.4%20-0.08%27/%3E%3C/filter%3E%3Crect%20width=%271200%27%20height=%27240%27%20filter=%27url(%23n)%27/%3E%3C/svg%3E";
+
 function HSwells({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
@@ -576,38 +585,6 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
             <stop offset="0.84" stopColor="#3d617a" stopOpacity="0.85" />
             <stop offset="1" stopColor="#2c4c62" stopOpacity="0" />
           </linearGradient>
-          {/* Organic tonal patches — break up any banding so the surface
-              reads as moving water, not ruled stripes */}
-          <filter id="water-organic-h" x="0%" y="0%" width="100%" height="100%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.012 0.03"
-              numOctaves="2"
-              seed="11"
-            />
-            <feColorMatrix
-              values="0 0 0 0 0.13
-                      0 0 0 0 0.27
-                      0 0 0 0 0.36
-                      0 0 0 0.5 -0.06"
-            />
-            <feComposite in2="SourceGraphic" operator="in" />
-          </filter>
-          <filter id="water-organic-h2" x="0%" y="0%" width="100%" height="100%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.016 0.045"
-              numOctaves="2"
-              seed="29"
-            />
-            <feColorMatrix
-              values="0 0 0 0 0.87
-                      0 0 0 0 0.92
-                      0 0 0 0 0.95
-                      0 0 0 0.4 -0.08"
-            />
-            <feComposite in2="SourceGraphic" operator="in" />
-          </filter>
           <linearGradient id="water-edge-h" x1="0" x2="1" y1="0" y2="0">
             <stop offset="0" stopColor="#f0efec" stopOpacity="0" />
             <stop offset="0.1" stopColor="#f0efec" stopOpacity="0.55" />
@@ -641,12 +618,35 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
         <ellipse cx="820" cy="136" rx="260" ry="12" fill="#eef5f9" opacity="0.1" />
         <ellipse cx="600" cy="108" rx="150" ry="7" fill="#f6fafc" opacity="0.14" />
 
-        {/* Organic tone patches — static (rasterized once). Animating these
-            forced huge turbulence filters to re-render per frame and tanked
-            the water's frame rate on slower machines. */}
+        {/* Drifting organic tone patches — two baked-noise tiles, opposite
+            directions. Bitmaps translate on the GPU; no live filters. */}
         <g clipPath="url(#water-clip-h)">
-          <rect x="0" y="80" width="1200" height="240" fill="#22455c" filter="url(#water-organic-h)" opacity="0.16" />
-          <rect x="0" y="80" width="1200" height="240" fill="#dfeaf1" filter="url(#water-organic-h2)" opacity="0.1" />
+          <g opacity="0.16">
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="translate"
+              from="0 0"
+              to="-1200 0"
+              dur="58s"
+              repeatCount="indefinite"
+            />
+            <image href={ORGANIC_DARK} x="0" y="80" width="1200" height="240" preserveAspectRatio="none" />
+            <image href={ORGANIC_DARK} x="1200" y="80" width="1200" height="240" preserveAspectRatio="none" />
+          </g>
+          <g opacity="0.1">
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="translate"
+              from="-1200 0"
+              to="0 0"
+              dur="74s"
+              repeatCount="indefinite"
+            />
+            <image href={ORGANIC_LIGHT} x="0" y="80" width="1200" height="240" preserveAspectRatio="none" />
+            <image href={ORGANIC_LIGHT} x="1200" y="80" width="1200" height="240" preserveAspectRatio="none" />
+          </g>
         </g>
 
         {/* Sun-sheen — slow breathing patch of reflected light */}
