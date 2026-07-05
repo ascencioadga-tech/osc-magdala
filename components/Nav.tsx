@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { nav } from "@/lib/content";
 
@@ -14,9 +15,11 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // When over hero (top of page) the nav is transparent with cream text.
-  // After scrolling past the hero it picks up the cream backdrop and burgundy text.
-  const overHero = !scrolled;
+  // The transparent cream-text start state only works over the homepage's
+  // dark hero. Every other route starts on the light page ground, so the
+  // header is solid (dark links) from the first pixel.
+  const pathname = usePathname();
+  const overHero = pathname === "/" && !scrolled;
 
   return (
     <header className="fixed inset-x-0 top-0 z-40">

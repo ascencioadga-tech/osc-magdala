@@ -71,6 +71,11 @@ export function OnenessStone() {
             <div className="stone-breathe">
               <CircleStone />
             </div>
+            <p className="font-serif mx-auto mt-4 max-w-md text-center text-[13px] italic leading-relaxed text-ink/50">
+              The Oneness Stone is a placeholder — its exact form will be
+              closely tied to the art project, which is still in early
+              conceptual development.
+            </p>
           </motion.div>
 
           {/* RIGHT — copy */}
@@ -198,10 +203,18 @@ function bandPlacement(angleDeg: number, dy: number, turn: number) {
   const light = Math.exp(-lx * lx) * 0.22;
   // Fade steeply near the turn so lettering melts into shadow, never clips.
   const edge = Math.min(1, (c - 0.18) / 0.26);
+  // Engraved-on-the-surface physics: the baseline follows the tangent of
+  // the drum's elliptical rim — level at front-center, tilting as it
+  // wraps toward the edges — plus a whisper of depth scale (the sides of
+  // the drum are farther from the eye than the front).
+  const s = Math.sin(theta * DEG);
+  const tilt = r2((Math.atan2(-RY * s, RX * c) * 180) / Math.PI);
   return {
     x,
     y: r2(CYT + RY * c + dy),
-    sx: r2(Math.max(c, 0.1)), // foreshortening
+    sx: r2(Math.max(c, 0.1)), // foreshortening along the wrap
+    sy: r2(0.93 + 0.07 * c), // depth
+    tilt,
     o: r2(Math.min(0.45 + 0.5 * c + light, 1) * (0.12 + 0.88 * edge)),
   };
 }
@@ -232,7 +245,7 @@ function CircleStone() {
           el.style.display = "none";
         } else {
           el.style.display = "";
-          el.style.transform = `translate(${pos.x}px, ${pos.y}px) scaleX(${pos.sx})`;
+          el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.tilt}deg) scale(${pos.sx}, ${pos.sy})`;
           el.style.opacity = String(pos.o);
         }
       });
@@ -321,6 +334,21 @@ function CircleStone() {
             />
             <feComposite in2="SourceGraphic" operator="in" />
           </filter>
+          <filter id="osPitsD" x="-2%" y="-2%" width="104%" height="104%">
+            <feTurbulence
+              type="turbulence"
+              baseFrequency="0.09"
+              numOctaves="2"
+              seed="17"
+            />
+            <feColorMatrix
+              values="0 0 0 0 0.05
+                      0 0 0 0 0.04
+                      0 0 0 0 0.03
+                      0 0 0 0.42 -0.05"
+            />
+            <feComposite in2="SourceGraphic" operator="in" />
+          </filter>
           <radialGradient id="osShadow" cx="0.5" cy="0.5" r="0.5">
             <stop offset="0" stopColor="#241d14" stopOpacity="0.34" />
             <stop offset="0.65" stopColor="#241d14" stopOpacity="0.14" />
@@ -345,14 +373,14 @@ function CircleStone() {
         {/* Ground shadow — cast long to the right of the key light */}
         <ellipse
           cx={CX + 44}
-          cy={CYT + BAND_H + RY + 10}
+          cy={CYT + BAND_H + RY + 14}
           rx={RX * 1.12}
           ry={20}
           fill="url(#osShadow)"
         />
         <ellipse
           cx={CX + 10}
-          cy={CYT + BAND_H + RY + 2}
+          cy={CYT + BAND_H + RY + 7}
           rx={RX * 0.82}
           ry={9}
           fill="#1c160f"
@@ -360,6 +388,21 @@ function CircleStone() {
         />
 
         <g filter="url(#osRough)">
+          {/* Base molding — a slightly wider foot the drum stands on */}
+          <ellipse
+            cx={CX}
+            cy={CYT + BAND_H + 7}
+            rx={RX + 8}
+            ry={RY + 3}
+            fill="#373026"
+          />
+          <path
+            d={`M ${CX - RX - 8} ${CYT + BAND_H + 7} A ${RX + 8} ${RY + 3} 0 0 0 ${CX + RX + 8} ${CYT + BAND_H + 7}`}
+            fill="none"
+            stroke="#f7f1e3"
+            strokeWidth="0.8"
+            opacity="0.14"
+          />
           <path
             d={`M ${CX - RX} ${CYT} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT} L ${CX + RX} ${CYT + BAND_H} A ${RX} ${RY} 0 0 1 ${CX - RX} ${CYT + BAND_H} Z`}
             fill="url(#osWall)"
@@ -367,20 +410,26 @@ function CircleStone() {
           <g clipPath="url(#osWallClip)">
             <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osGrainD)" opacity="0.55" />
             <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osBlotchD)" opacity="0.5" />
-            <path
-              d={`M ${CX - RX} ${CYT + 46} A ${RX} ${RY * 1.02} 0 0 0 ${CX + RX} ${CYT + 46}`}
-              fill="none"
-              stroke="#211b14"
-              strokeWidth="0.9"
-              opacity="0.35"
-            />
-            <path
-              d={`M ${CX - RX} ${CYT + 84} A ${RX} ${RY * 1.04} 0 0 0 ${CX + RX} ${CYT + 84}`}
-              fill="none"
-              stroke="#211b14"
-              strokeWidth="0.8"
-              opacity="0.28"
-            />
+            {/* Incised guide rules — the carver's ledger lines between the
+                rows of names, each a dark groove with a lit lower lip */}
+            {[16, 46, 76, 106].map((d) => (
+              <g key={d}>
+                <path
+                  d={`M ${CX - RX} ${CYT + d} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT + d}`}
+                  fill="none"
+                  stroke="#211b14"
+                  strokeWidth="0.9"
+                  opacity="0.45"
+                />
+                <path
+                  d={`M ${CX - RX} ${CYT + d + 1.2} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT + d + 1.2}`}
+                  fill="none"
+                  stroke="#f7f1e3"
+                  strokeWidth="0.5"
+                  opacity="0.14"
+                />
+              </g>
+            ))}
             <rect x={CX - RX} y={CYT - 4} width={RX * 2} height={BAND_H + RY + 8} fill="url(#osKey)" />
             <rect x={CX - RX} y={CYT - 4} width={190} height={BAND_H + RY + 8} fill="url(#osTurnL)" />
             <rect x={CX + RX - 190} y={CYT - 4} width={190} height={BAND_H + RY + 8} fill="url(#osTurnR)" />
@@ -396,11 +445,43 @@ function CircleStone() {
           <ellipse cx={CX} cy={CYT} rx={RX} ry={RY} fill="url(#osTop)" />
           <ellipse cx={CX} cy={CYT} rx={RX} ry={RY} fill="url(#osSheen)" />
           <g clipPath="url(#osTopClip)">
-            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osGrainD)" opacity="0.4" />
-            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osBlotchD)" opacity="0.26" />
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osGrainD)" opacity="0.55" />
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osBlotchD)" opacity="0.42" />
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osPitsD)" opacity="0.3" />
             <ellipse cx={CX - 92} cy={CYT - 16} rx={70} ry={22} fill="#8d816c" opacity="0.2" />
             <ellipse cx={CX + 88} cy={CYT + 14} rx={64} ry={20} fill="#6e6250" opacity="0.22" />
             <ellipse cx={CX - 10} cy={CYT + 34} rx={80} ry={18} fill="#4e463c" opacity="0.22" />
+            <ellipse cx={CX - 168} cy={CYT + 22} rx={44} ry={14} fill="#5a5044" opacity="0.26" />
+            <ellipse cx={CX + 172} cy={CYT - 26} rx={40} ry={12} fill="#665a4b" opacity="0.24" />
+            {/* peripheral fissures — away from the dedication */}
+            <path
+              d={`M ${CX - 226} ${CYT + 8} q 26 14 58 10 q 22 -3 34 8`}
+              fill="none"
+              stroke="#17120d"
+              strokeWidth="0.7"
+              strokeOpacity="0.45"
+              strokeLinecap="round"
+            />
+            <path
+              d={`M ${CX + 150} ${CYT + 34} q 28 6 52 -4`}
+              fill="none"
+              stroke="#17120d"
+              strokeWidth="0.6"
+              strokeOpacity="0.4"
+              strokeLinecap="round"
+            />
+            <path
+              d={`M ${CX + 60} ${CYT - 52} q 30 8 62 2`}
+              fill="none"
+              stroke="#17120d"
+              strokeWidth="0.55"
+              strokeOpacity="0.32"
+              strokeLinecap="round"
+            />
+            {/* rim chips — worn bites along the top edge */}
+            <ellipse cx={CX - 234} cy={CYT - 18} rx={9} ry={4} fill="#2e2720" opacity="0.3" transform={`rotate(-24 ${CX - 234} ${CYT - 18})`} />
+            <ellipse cx={CX + 226} cy={CYT + 26} rx={11} ry={4.5} fill="#2e2720" opacity="0.28" transform={`rotate(18 ${CX + 226} ${CYT + 26})`} />
+            <ellipse cx={CX - 96} cy={CYT - 66} rx={10} ry={3.5} fill="#2e2720" opacity="0.26" transform={`rotate(-8 ${CX - 96} ${CYT - 66})`} />
             {[
               [96, -34, 1.0, "#211c16"],
               [178, -6, 0.7, "#a89a86"],
@@ -453,7 +534,7 @@ function CircleStone() {
                 style={{
                   display: pos ? undefined : "none",
                   transform: pos
-                    ? `translate(${pos.x}px, ${pos.y}px) scaleX(${pos.sx})`
+                    ? `translate(${pos.x}px, ${pos.y}px) rotate(${pos.tilt}deg) scale(${pos.sx}, ${pos.sy})`
                     : undefined,
                   opacity: pos ? pos.o : undefined,
                 }}
@@ -487,7 +568,16 @@ function CircleStone() {
                     </text>
                   </>
                 ) : (
-                  <path d="M 0 -6.4 L 1.8 -3.8 L 0 -1.2 L -1.8 -3.8 Z" fill={BONE} opacity="0.26" />
+                  <rect
+                    x="-1.9"
+                    y="-5.9"
+                    width="3.8"
+                    height="3.8"
+                    rx="0.5"
+                    fill={(i >> 1) % 2 ? "#b19277" : "#d9cfbc"}
+                    opacity="0.32"
+                    transform="rotate(12)"
+                  />
                 )}
               </g>
             );
@@ -519,13 +609,6 @@ function CircleStone() {
         >
           THE ONENESS STONE
         </text>
-        <line x1={CX - 52} y1={CYT + 2} x2={CX - 10} y2={CYT + 2} stroke={BONE} strokeWidth="0.8" opacity="0.5" />
-        <line x1={CX + 10} y1={CYT + 2} x2={CX + 52} y2={CYT + 2} stroke={BONE} strokeWidth="0.8" opacity="0.5" />
-        <path
-          d={`M ${CX} ${CYT - 2} L ${CX + 4} ${CYT + 2} L ${CX} ${CYT + 6} L ${CX - 4} ${CYT + 2} Z`}
-          fill="#b19277"
-          opacity="0.9"
-        />
         <text
           x={CX + 0.7}
           y={CYT + 26.9}
