@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 
 const reverentEase = [0.22, 0.8, 0.32, 1] as const;
@@ -132,6 +133,27 @@ export function OnenessStone() {
               <span className="font-serif text-base italic text-burgundy/85 md:text-lg">
                 “That they may all be one.” — John 17:21
               </span>
+            </motion.div>
+
+            {/* CTA — the stone's story continues on the benefactors page */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.58, ease: reverentEase }}
+              className="mt-8 flex justify-center md:justify-start"
+            >
+              <Link
+                href="/benefactors"
+                className="group inline-flex items-center gap-2.5 rounded-full bg-burgundy px-7 py-3.5 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
+              >
+                Become a benefactor
+                <span
+                  aria-hidden="true"
+                  className="transition group-hover:translate-x-1"
+                >
+                  →
+                </span>
+              </Link>
             </motion.div>
 
           </div>
