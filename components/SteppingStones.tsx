@@ -641,32 +641,12 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
         <ellipse cx="820" cy="136" rx="260" ry="12" fill="#eef5f9" opacity="0.1" />
         <ellipse cx="600" cy="108" rx="150" ry="7" fill="#f6fafc" opacity="0.14" />
 
-        {/* Drifting organic tone patches — two layers, opposite directions */}
+        {/* Organic tone patches — static (rasterized once). Animating these
+            forced huge turbulence filters to re-render per frame and tanked
+            the water's frame rate on slower machines. */}
         <g clipPath="url(#water-clip-h)">
-          <g opacity="0.16">
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="translate"
-              from="0 0"
-              to="-1200 0"
-              dur="58s"
-              repeatCount="indefinite"
-            />
-            <rect x="0" y="80" width="2400" height="240" fill="#22455c" filter="url(#water-organic-h)" />
-          </g>
-          <g opacity="0.1">
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="translate"
-              from="-1200 0"
-              to="0 0"
-              dur="74s"
-              repeatCount="indefinite"
-            />
-            <rect x="0" y="80" width="2400" height="240" fill="#dfeaf1" filter="url(#water-organic-h2)" />
-          </g>
+          <rect x="0" y="80" width="1200" height="240" fill="#22455c" filter="url(#water-organic-h)" opacity="0.16" />
+          <rect x="0" y="80" width="1200" height="240" fill="#dfeaf1" filter="url(#water-organic-h2)" opacity="0.1" />
         </g>
 
         {/* Sun-sheen — slow breathing patch of reflected light */}
@@ -685,7 +665,7 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 0"
             to="-1200 0"
-            dur="44s"
+            dur="36s"
             repeatCount="indefinite"
           />
           <HSwells x={0} />
@@ -710,7 +690,7 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
               type="translate"
               from="0 0"
               to="-1200 0"
-              dur="24s"
+              dur="19s"
               repeatCount="indefinite"
             />
             <HCrests x={0} />
@@ -726,7 +706,7 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 0"
             to="-1200 0"
-            dur="13s"
+            dur="10s"
             repeatCount="indefinite"
           />
           <HGlints x={0} />
@@ -867,7 +847,7 @@ function WaterVertical({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 -1200"
             to="0 0"
-            dur="44s"
+            dur="36s"
             repeatCount="indefinite"
           />
           <VSwells y={0} />
@@ -892,7 +872,7 @@ function WaterVertical({ reveal }: { reveal: boolean }) {
               type="translate"
               from="0 -1200"
               to="0 0"
-              dur="24s"
+              dur="19s"
               repeatCount="indefinite"
             />
             <VCrests y={0} />
@@ -908,7 +888,7 @@ function WaterVertical({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 -1200"
             to="0 0"
-            dur="13s"
+            dur="10s"
             repeatCount="indefinite"
           />
           <VGlints y={0} />
