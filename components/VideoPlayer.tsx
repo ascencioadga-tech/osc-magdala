@@ -34,6 +34,34 @@ export function VideoPlayer({
   const [buffered, setBuffered] = useState(0); // 0–100 %
   const [fullscreen, setFullscreen] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
+  // First-play smoothing: the poster cross-fades into the footage and the
+  // audio ramps up from silence, so the video never starts abruptly.
+  const [started, setStarted] = useState(false);
+  const [veilDone, setVeilDone] = useState(false);
+  const rampRaf = useRef<number | null>(null);
+  const hasRampedRef = useRef(false);
+
+  const rampVolume = (v: HTMLVideoElement) => {
+    if (hasRampedRef.current) return;
+    hasRampedRef.current = true;
+    const DURATION = 2200;
+    const t0 = performance.now();
+    v.volume = 0;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - t0) / DURATION);
+      v.volume = 1 - (1 - k) * (1 - k); // ease-out
+      rampRaf.current = k < 1 ? requestAnimationFrame(step) : null;
+    };
+    rampRaf.current = requestAnimationFrame(step);
+  };
+
+  const cancelRamp = (v: HTMLVideoElement | null) => {
+    if (rampRaf.current !== null) {
+      cancelAnimationFrame(rampRaf.current);
+      rampRaf.current = null;
+      if (v) v.volume = 1;
+    }
+  };
 
   useEffect(() => {
     const v = videoRef.current;
@@ -42,8 +70,15 @@ export function VideoPlayer({
     const onTimeUpdate = () => setCurrentTime(v.currentTime);
     const onLoadedMetadata = () => setDuration(v.duration || 0);
     const onDurationChange = () => setDuration(v.duration || 0);
-    const onPlay = () => setPlaying(true);
-    const onPause = () => setPlaying(false);
+    const onPlay = () => {
+      setPlaying(true);
+      setStarted(true);
+    };
+    const onPause = () => {
+      setPlaying(false);
+      // If paused mid-ramp, settle the volume so later plays are full.
+      cancelRamp(v);
+    };
     const onVolumeChange = () => setMuted(v.muted);
     const onProgress = () => {
       if (!v.duration || !v.buffered.length) return;
@@ -84,7 +119,9 @@ export function VideoPlayer({
       v.removeEventListener("pause", onPause);
       v.removeEventListener("volumechange", onVolumeChange);
       v.removeEventListener("progress", onProgress);
+      if (rampRaf.current !== null) cancelAnimationFrame(rampRaf.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fullscreen state — track both standard and webkit-prefixed APIs (Safari)
@@ -109,6 +146,8 @@ export function VideoPlayer({
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
+      // Ease the audio in on the very first play.
+      rampVolume(v);
       const p = v.play();
       if (p && typeof p.then === "function") {
         p.catch(() => {
@@ -223,11 +262,9 @@ export function VideoPlayer({
     <div
       ref={containerRef}
       className={[
-        "group relative overflow-hidden rounded-xl border border-cream/15 bg-burgundy-deep shadow-[0_40px_80px_-30px_rgba(0,0,0,0.55)]",
+        "group relative overflow-hidden rounded-xl bg-[#16090f] shadow-[0_28px_64px_-28px_rgba(0,0,0,0.55)]",
         // Hold the 16:9 ratio normally, but go full-window in fullscreen
-        fullscreen
-          ? "h-screen w-screen rounded-none border-0"
-          : "aspect-video",
+        fullscreen ? "h-screen w-screen rounded-none" : "aspect-video",
         className,
       ].join(" ")}
       onMouseEnter={() => setHovered(true)}
@@ -253,6 +290,43 @@ export function VideoPlayer({
         ) : null}
       </video>
 
+      {/* Poster cross-fade — the still dissolves into the moving footage on
+          first play instead of snapping to it. */}
+      <AnimatePresence>
+        {poster && !started ? (
+          <motion.img
+            key="poster-still"
+            src={poster}
+            alt=""
+            aria-hidden="true"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 0.8, 0.32, 1] }}
+            className="pointer-events-none absolute inset-0 h-full w-full rounded-[inherit] object-cover"
+          />
+        ) : null}
+      </AnimatePresence>
+
+      {/* First-play veil — the frame starts dimmed and the light lifts over
+          ~1.6s, like house lights coming up. This is the part of the smooth
+          intro the eye actually feels (the poster is a frame of the footage,
+          so a poster crossfade alone reads as nothing). */}
+      {started && !veilDone ? (
+        <motion.div
+          aria-hidden="true"
+          initial={{ opacity: 0.7 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1.6, ease: [0.22, 0.8, 0.32, 1] }}
+          onAnimationComplete={() => setVeilDone(true)}
+          className="pointer-events-none absolute inset-0 bg-[#16090f]"
+        />
+      ) : null}
+
+      {/* Liquid-glass edge — a single hairline inset ring, like screen glass */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/12"
+      />
+
       {/* Big centered play overlay when paused */}
       <AnimatePresence>
         {showOverlay ? (
@@ -264,37 +338,26 @@ export function VideoPlayer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="absolute inset-0 grid place-items-center bg-burgundy-ink/35 backdrop-blur-[1.5px] focus:outline-none"
+            className="absolute inset-0 grid place-items-center focus:outline-none"
             aria-label="Play video"
           >
+            {/* Quiet vignette for contrast — no blur, no heavy wash */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-black/15"
+            />
             <motion.span
-              initial={{ scale: 0.85 }}
+              initial={{ scale: 0.92 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 0.35, ease: [0.22, 0.8, 0.32, 1] }}
-              className="grid h-16 w-16 place-items-center rounded-full bg-cream text-burgundy shadow-[0_8px_24px_rgba(0,0,0,0.45)] ring-1 ring-gold-light/50 transition-transform group-hover:scale-105 md:h-20 md:w-20"
+              transition={{ duration: 0.4, ease: [0.22, 0.8, 0.32, 1] }}
+              className="relative grid h-16 w-16 place-items-center rounded-full border border-white/35 bg-white/10 backdrop-blur-md transition-all duration-300 group-hover:border-white/60 group-hover:bg-white/20 md:h-[72px] md:w-[72px]"
+              style={{ boxShadow: "0 10px 36px rgba(0,0,0,0.35)" }}
             >
-              <PlayIcon className="ml-[2px] h-7 w-7 md:h-8 md:w-8" />
+              <PlayIcon className="ml-[2px] h-5 w-5 text-white/95 md:h-6 md:w-6" />
             </motion.span>
           </motion.button>
         ) : null}
       </AnimatePresence>
-
-      {/* Top-left label strip — visible alongside the controls */}
-      <motion.div
-        initial={false}
-        animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -6 }}
-        transition={{ duration: 0.25 }}
-        className="pointer-events-none absolute inset-x-0 top-0"
-      >
-        <div className="bg-gradient-to-b from-burgundy-ink/70 via-burgundy-ink/15 to-transparent px-4 pb-12 pt-3 md:px-6 md:pb-14 md:pt-4">
-          <div className="flex items-center gap-2 text-cream/90">
-            <span aria-hidden="true" className="block h-px w-6 bg-gold-light" />
-            <span className="text-[10px] uppercase tracking-[0.28em] md:text-[11px]">
-              {label}
-            </span>
-          </div>
-        </div>
-      </motion.div>
 
       {/* Bottom controls bar */}
       <motion.div
@@ -307,7 +370,7 @@ export function VideoPlayer({
         ].join(" ")}
         onClick={stop}
       >
-        <div className="bg-gradient-to-t from-burgundy-ink/85 via-burgundy-ink/45 to-transparent px-4 pb-4 pt-10 md:px-6 md:pb-5 md:pt-14">
+        <div className="bg-gradient-to-t from-black/55 via-black/20 to-transparent px-4 pb-3.5 pt-9 md:px-5 md:pb-4 md:pt-12">
           {/* Seek hit zone — generous vertical padding so the bar is easy
               to click; pointer-capture handles drag-to-scrub. */}
           <div
@@ -325,53 +388,53 @@ export function VideoPlayer({
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            {/* Track */}
-            <div className="relative h-1.5 rounded-full bg-cream/20 transition-[height] group-hover/seek:h-2">
+            {/* Track — hairline that thickens slightly on hover */}
+            <div className="relative h-[3px] rounded-full bg-white/20 transition-[height] group-hover/seek:h-[5px]">
               {/* Buffered indicator */}
               <div
-                className="absolute inset-y-0 left-0 rounded-full bg-cream/30"
+                className="absolute inset-y-0 left-0 rounded-full bg-white/25"
                 style={{ width: `${buffered}%` }}
               />
               {/* Played indicator */}
               <div
-                className="absolute inset-y-0 left-0 rounded-full bg-gold-light"
+                className="absolute inset-y-0 left-0 rounded-full bg-white/90"
                 style={{ width: `${progress}%` }}
               />
-              {/* Scrub handle */}
+              {/* Scrub handle — small white dot */}
               <div
                 className={[
-                  "absolute top-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-cream shadow-[0_2px_6px_rgba(0,0,0,0.45)] ring-2 ring-burgundy-deep/55 transition-opacity",
+                  "absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-white shadow-[0_1px_4px_rgba(0,0,0,0.4)] transition-opacity",
                   scrubbing
                     ? "opacity-100"
                     : "opacity-0 group-hover/seek:opacity-100",
                 ].join(" ")}
-                style={{ left: `calc(${progress}% - 7px)` }}
+                style={{ left: `calc(${progress}% - 5px)` }}
               />
             </div>
           </div>
 
-          {/* Buttons row */}
-          <div className="mt-2 flex items-center justify-between text-cream">
-            <div className="flex items-center gap-3">
+          {/* Buttons row — small, thin, quiet */}
+          <div className="mt-1.5 flex items-center justify-between text-white/85">
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={(e) => { stop(e); togglePlay(); }}
                 aria-label={playing ? "Pause" : "Play"}
-                className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-cream/15"
+                className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-white/10 hover:text-white"
               >
                 {playing ? <PauseIcon /> : <PlayIcon className="ml-[2px]" />}
               </button>
-              <span className="font-mono text-[11px] tabular-nums text-cream/80 md:text-xs">
-                {fmt(currentTime)} <span className="text-cream/40">/</span>{" "}
+              <span className="text-[11px] tabular-nums tracking-[0.06em] text-white/65">
+                {fmt(currentTime)} <span className="text-white/35">/</span>{" "}
                 {fmt(duration)}
               </span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <button
                 type="button"
                 onClick={(e) => { stop(e); toggleMute(); }}
                 aria-label={muted ? "Unmute" : "Mute"}
-                className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-cream/15"
+                className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-white/10 hover:text-white"
               >
                 {muted ? <MutedIcon /> : <UnmutedIcon />}
               </button>
@@ -379,7 +442,7 @@ export function VideoPlayer({
                 type="button"
                 onClick={(e) => { stop(e); toggleFullscreen(); }}
                 aria-label={fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-                className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-cream/15"
+                className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-white/10 hover:text-white"
               >
                 {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
               </button>
@@ -410,7 +473,7 @@ function PauseIcon() {
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden="true"
-      className="h-5 w-5"
+      className="h-[18px] w-[18px]"
     >
       <rect x="6" y="4.5" width="4" height="15" rx="1" />
       <rect x="14" y="4.5" width="4" height="15" rx="1" />
@@ -424,11 +487,11 @@ function MutedIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="h-5 w-5"
+      className="h-[18px] w-[18px]"
     >
       <path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor" stroke="none" />
       <line x1="16" y1="9" x2="22" y2="15" />
@@ -443,11 +506,11 @@ function UnmutedIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="h-5 w-5"
+      className="h-[18px] w-[18px]"
     >
       <path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor" stroke="none" />
       <path d="M15.5 8.5a5 5 0 0 1 0 7" />
@@ -462,11 +525,11 @@ function FullscreenIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="h-5 w-5"
+      className="h-[18px] w-[18px]"
     >
       <polyline points="4 9 4 4 9 4" />
       <polyline points="20 9 20 4 15 4" />
@@ -482,11 +545,11 @@ function ExitFullscreenIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="h-5 w-5"
+      className="h-[18px] w-[18px]"
     >
       <polyline points="9 4 9 9 4 9" />
       <polyline points="15 4 15 9 20 9" />

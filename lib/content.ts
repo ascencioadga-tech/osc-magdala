@@ -49,6 +49,14 @@ export type Stone = {
     width: number;
     height: number;
   }[];
+  /** Optional secondary feature button (e.g. Stone 1's "Genesis
+      Hospitality"): a labelled button that reveals a scripture + note. */
+  genesis?: {
+    label: string;
+    reference: string;
+    scripture: string;
+    note: string;
+  };
   /** Optional dropdown of further detail; the CTA becomes a toggle.
       Each section is rendered as an animated block with its own heading
       and an ordered list of paragraphs / bulleted lists. */
@@ -69,6 +77,13 @@ export const stones: Stone[] = [
     oneLine: "The kickoff — a restaurant at Magdala, built and run together.",
     title: "More than a restaurant",
     subtitle: "Building together a living sign of John 17",
+    genesis: {
+      label: "Genesis Hospitality",
+      reference: "Genesis 18:3–5",
+      scripture:
+        "“If I have found favor in your eyes, my lord, do not pass your servant by. Let a little water be brought, and then you may all wash your feet and rest under this tree. Let me get you something to eat, so you can be refreshed and then go on your way — now that you have come to your servant.”",
+      note: "Abraham & Sarah would need a restaurant in their backyard if they were catering to thousands of Galilee’s pilgrims!",
+    },
     body: "Jesus’ prayer for oneness still calls us forward. Built together by Christians from diverse traditions, the Restaurant Built Together witnesses permanently to John 17:20–23 — a monument to Christ’s prayer and a landmark beckoning us onward, renewed, one step closer in Christ.",
     cta: { label: "Learn More", href: "#" },
     expand: {
@@ -351,7 +366,7 @@ export const inAction = {
   intro:
     "The work as it unfolds — restaurant, volunteers, artwork, and the encounters along the way.",
   /** Self-hosted video file path (e.g. "/motb-recap.mp4"). */
-  video: "/motb-recap.mp4" as string | undefined,
+  video: "/motb-video.mp4" as string | undefined,
   /** YouTube URL or ID. Takes precedence over `video` if both are set. */
   youtube: undefined as string | undefined,
   /** Carousel images shown in the right column. */
@@ -386,7 +401,19 @@ export const prayer = {
   body: [
     "Jesus, You built the Church on the twelve foundation stones together with the names of the apostles. At Your last meal with the twelve before You suffered, You prayed to Abba, Your Father, that we might all be one so the world would believe that He sent You.",
     "You welcomed Samaritans and Gentiles, Greeks and Syrophoenicians, Romans and Ethiopians, and so brought together Jew and Gentile. After so many painful and damaging divisions we yearn for a unity that seems almost impossible — but, with You, nothing is impossible.",
-    "Show us how to bring together our five loaves and two fish, our six jars full of water — even a mere cup of water — so You can reveal Your Kingdom. Help us take one possible step closer together and offer hospitality together, so all can recognize You in the breaking of the Bread.",
+    "Show us how to bring together our five loaves and two fish, or our seven loaves and a few fish, our six jars full of water, even a mere cup of water, so You can reveal Your Kingdom. Help us take one possible step closer together and offer hospitality together, so all can recognize You in the breaking of the Bread.",
+  ],
+};
+
+export const hospitalityPrayer = {
+  epigraph: "When we welcome them, we welcome You",
+  title: "Hospitality Prayer",
+  body: [
+    "Jesus, You came to dwell among us, totally dependent on our hospitality. But when You grew, You fed the hungry abundantly, revealing the Father’s love. You accepted human hospitality from the women who provided for You and for the first pilgrim community of Your disciples. Bethany’s three-sibling family regularly welcomed You to their home. Matthew the tax-collector hosted a banquet for You in his house with his friends — sinners who heard the Good News of the Kingdom from Your lips.",
+    "You organized the Last Supper and washed our feet!",
+    "Even on Calvary You were offered a drink, and on Easter Sunday evening, some fish. Disciples unknowingly invited You to supper in Emmaus, and You broke bread to reveal Yourself to them.",
+    "Since Pentecost, the disciples have continued breaking bread together and serving the needy and destitute along the way. When we welcome them, we welcome You! May we continue to do this together until we reach the Heavenly Banquet. Hospitality and revelation are intertwined. We want to go out into the deep (Duc in Altum) to grow one step closer — now, every day, until You come again.",
+    "Come, Lord Jesus!",
   ],
 };
 

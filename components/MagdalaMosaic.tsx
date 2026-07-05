@@ -235,7 +235,7 @@ function MosaicVisual() {
             className="absolute inset-[4%] rounded-full"
             style={{
               background:
-                "radial-gradient(circle, rgba(224,185,100,0.32), rgba(200,146,58,0.10) 60%, transparent 75%)",
+                "radial-gradient(circle, rgba(177,146,119,0.32), rgba(99,53,17,0.10) 60%, transparent 75%)",
               filter: "blur(24px)",
             }}
             animate={{ scale: [1, 1.035, 1], opacity: [0.75, 1, 0.75] }}
@@ -252,7 +252,7 @@ function MosaicVisual() {
               className="object-contain"
               priority
               style={{
-                filter: "drop-shadow(0 18px 28px rgba(63, 16, 25, 0.18))",
+                filter: "drop-shadow(0 18px 28px rgba(63,14,34, 0.18))",
               }}
             />
           </div>
@@ -465,7 +465,7 @@ function MosaicVisual() {
                         href={SPONSOR_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-sm font-medium tracking-wide text-burgundy-ink ring-1 ring-gold-light/50 shadow-[0_16px_40px_-14px_rgba(200,146,58,0.6)] transition hover:ring-gold-light/80 hover:shadow-[0_22px_52px_-14px_rgba(200,146,58,0.8)]"
+                        className="group inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-sm font-medium tracking-wide text-burgundy-ink ring-1 ring-gold-light/50 shadow-[0_16px_40px_-14px_rgba(99,53,17,0.6)] transition hover:ring-gold-light/80 hover:shadow-[0_22px_52px_-14px_rgba(99,53,17,0.8)]"
                         style={{
                           background:
                             "linear-gradient(180deg, #edcc7a 0%, #d3a14a 48%, #c0872f 100%)",

@@ -1,25 +1,42 @@
 @import "tailwindcss";
 
 /*
-  One Step Closer — Brand System v1.0
-  Palette: burgundy / cream / gold / terracotta / parchment.
-  80/15/5 rule: cream is the page · burgundy is the voice · gold is the punctuation.
+  One Step Closer — Brand System v2.0 · "Magdala elegance"
+  Anchored to the official Magdala identity: Primary One wine #54132e,
+  Primary Two brown #633511, earth-tone secondaries, cream page, and a
+  brown-tint accents — no gold, no orange. The legacy token names
+  (burgundy / gold / terracotta) are kept so the whole codebase re-skins
+  from this single block.
+  80/15/5 rule: grey is the page · wine is the voice · brown is the accent.
 */
 
 @theme {
-  --color-burgundy: #6a2045;
-  --color-burgundy-deep: #3f1019;
-  --color-burgundy-ink: #2a0810;
-  --color-gold: #c8923a;
-  --color-gold-light: #e0b964;
-  --color-terracotta: #b5552e;
+  /* Magdala Primary One — wine */
+  --color-burgundy: #54132e;
+  --color-burgundy-deep: #3f0e22;
+  --color-burgundy-ink: #290818;
+  /* Magdala Primary Two — brown */
+  --color-brown: #633511;
+  --color-brown-deep: #4a2610;
+  /* Accent — Magdala Primary Two brown and its official tints. No gold,
+     no orange. Token names "gold"/"terracotta" are kept only so the whole
+     codebase re-skins from this block. */
+  --color-gold: #8a6746;
+  --color-gold-light: #b19277;
+  --color-terracotta: #633511;
+  /* Magdala grey (official secondary, c0 m0 y0 k72) */
+  --color-stone-grey: #5b5b5b;
+  /* Galilee water tones (representational — used only for water) */
   --color-blue: #3e5c7a;
   --color-blue-light: #7a95b0;
-  --color-sand: #f2e8d5;
-  --color-cream: #faf5ea;
-  --color-parchment: #ede0c4;
-  --color-ink: #2a1418;
-  --color-olive: #6b7a4a;
+  /* Neutrals — the page ground is a light grey (kept under the legacy
+     "cream" token name so the whole site re-skins from here) */
+  --color-sand: #f0e8d8;
+  --color-cream: #f0efec;
+  --color-parchment: #e9dec6;
+  /* Warm espresso ink */
+  --color-ink: #2a1c14;
+  --color-olive: #6a6540;
 
   --font-sans: var(--font-sans-body);
   --font-display: var(--font-display);
@@ -27,8 +44,8 @@
 }
 
 :root {
-  --color-line: rgba(92, 26, 43, 0.18);
-  --color-line-soft: rgba(92, 26, 43, 0.10);
+  --color-line: rgba(84, 19, 46, 0.16);
+  --color-line-soft: rgba(84, 19, 46, 0.09);
 }
 
 html,
@@ -109,22 +126,24 @@ body {
   will-change: transform;
 }
 
-/* Diagonal walking footsteps — used in OSCInAction section.
-   Each footprint has its own animation-delay; they appear in sequence
-   along a path from top-left to bottom-right, then loop. The wrapper
-   span carries the rotation + L/R flip; this keyframe handles opacity
-   + a small "press into the sand" scale and lift. */
-@keyframes footstep-walk {
-  0%, 5%  { opacity: 0; transform: translateY(10px) scale(0.82); }
-  12%     { opacity: 0.7; transform: translateY(0) scale(1); }
-  82%     { opacity: 0.7; transform: translateY(0) scale(1); }
-  100%    { opacity: 0; transform: translateY(-4px) scale(0.96); }
+/* Specular glints on the Stepping Stones water — each glint twinkles on
+   its own delay (set inline) while the layer it sits in drifts. */
+@keyframes water-glint {
+  0%, 100% { opacity: 0.05; }
+  50%      { opacity: 0.85; }
 }
-.footstep-walk {
-  /* Slower + ease-out so each step feels deliberate, like a foot pressing
-     into wet sand rather than a snappy UI animation. */
-  animation: footstep-walk 9s cubic-bezier(0.22, 0.8, 0.32, 1) infinite;
-  will-change: opacity, transform;
+.water-glint {
+  animation: water-glint 4.2s ease-in-out infinite;
+}
+
+/* Soft sun-sheen patch on the water — slow breathing drift. */
+@keyframes water-sheen {
+  0%, 100% { transform: translate3d(-2%, 0, 0) scale(1); opacity: 0.5; }
+  50%      { transform: translate3d(2%, 1%, 0) scale(1.08); opacity: 0.8; }
+}
+.water-sheen {
+  animation: water-sheen 14s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 /* Slow gold embers that drift upward — used in Crossroads section */
@@ -146,23 +165,47 @@ body {
 @keyframes stone-hint {
   0% {
     box-shadow:
-      0 0 0 0 rgba(224, 185, 100, 0.55),
-      0 0 0 0 rgba(224, 185, 100, 0.35);
+      0 0 0 0 rgba(177,146,119, 0.55),
+      0 0 0 0 rgba(177,146,119, 0.35);
   }
   60% {
     box-shadow:
-      0 0 0 14px rgba(224, 185, 100, 0),
-      0 0 0 28px rgba(224, 185, 100, 0);
+      0 0 0 14px rgba(177,146,119, 0),
+      0 0 0 28px rgba(177,146,119, 0);
   }
   100% {
     box-shadow:
-      0 0 0 0 rgba(224, 185, 100, 0),
-      0 0 0 0 rgba(224, 185, 100, 0);
+      0 0 0 0 rgba(177,146,119, 0),
+      0 0 0 0 rgba(177,146,119, 0);
   }
 }
 .stone-hint {
   border-radius: 9999px;
   animation: stone-hint 2.6s ease-out infinite;
+}
+
+/* Liquid-glass sheen sweeping across the Oneness Stone — a soft band of
+   light glides over the drum, rests, then sweeps again. */
+@keyframes oneness-sheen {
+  0%   { transform: translateX(-430px); opacity: 0; }
+  8%   { opacity: 1; }
+  46%  { opacity: 1; }
+  55%  { transform: translateX(430px); opacity: 0; }
+  100% { transform: translateX(430px); opacity: 0; }
+}
+.oneness-sheen {
+  animation: oneness-sheen 12s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}
+
+/* Barely-perceptible camera breathe on the Oneness Stone */
+@keyframes stone-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.012); }
+}
+.stone-breathe {
+  animation: stone-breathe 26s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* The Oneness Stone millstone — the rock (with its inscribed name rings)
@@ -205,7 +248,11 @@ body {
   .animate-scroll-cue,
   .water-shimmer,
   .ripple-pulse,
-  .oneness-rotor {
+  .oneness-rotor,
+  .oneness-sheen,
+  .stone-breathe,
+  .water-glint,
+  .water-sheen {
     animation: none !important;
   }
 }

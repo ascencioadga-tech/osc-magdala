@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
 const reverentEase = [0.22, 0.8, 0.32, 1] as const;
@@ -64,11 +64,13 @@ export function OnenessStone() {
         <div className="grid items-center gap-12 md:grid-cols-[0.95fr_1fr] md:gap-16 lg:gap-20">
           {/* LEFT — the rotating stone */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.94, x: -24 }}
-            animate={inView ? { opacity: 1, scale: 1, x: 0 } : {}}
-            transition={{ duration: 1.1, delay: 0.2, ease: reverentEase }}
+            initial={{ opacity: 0, y: 46, scale: 0.965 }}
+            animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+            transition={{ duration: 1.7, delay: 0.2, ease: reverentEase }}
           >
-            <CircleStone />
+            <div className="stone-breathe">
+              <CircleStone />
+            </div>
           </motion.div>
 
           {/* RIGHT — copy */}
@@ -126,6 +128,7 @@ export function OnenessStone() {
                 “That they may all be one.” — John 17:21
               </span>
             </motion.div>
+
           </div>
         </div>
       </div>
@@ -134,383 +137,473 @@ export function OnenessStone() {
 }
 
 // ────────────────────────────────────────────────────────────────────
-// The round Oneness Stone — a pale-limestone millstone that rotates
-// slowly. The rock (mottling, veins, and three rings of inscribed
-// names) turns as one body via the .oneness-rotor CSS animation, while
-// the lighting (dome shading, sunlit rim, grain) and the center hub
-// (title + scripture) stay fixed, like a millstone around its axle.
-// All coordinates are static, so server and client render identically.
+// The Oneness Stone — a rotating cylindrical base.
+// A stone drum seen slightly from above: the dedication rests on the
+// flat top; the names of the churches are inscribed around the drum's
+// thickness and travel with it as it slowly turns. Flat, editorial
+// finish — hairlines and type, no simulated 3D theater beyond the
+// geometry itself.
+//
+// The band is driven by a small rAF loop (transform-only updates on
+// ~60 nodes). Initial positions are computed at t = 0 with rounded
+// coordinates, so server and client render identically before the
+// animation takes over. prefers-reduced-motion leaves it still.
 // ────────────────────────────────────────────────────────────────────
 
-// One ring of names inscribed tangentially around the center. Each name
-// is engraved with a cheap two-copy technique (light catch offset below,
-// dark glyph on top) so the rotating group needs no SVG filters — filters
-// re-rasterize every animation frame and would be expensive.
-function NameRing({
-  names,
-  radius,
-  fontSize,
-  offsetDeg,
-  cx,
-  cy,
-}: {
-  names: string[];
-  radius: number;
-  fontSize: number;
-  offsetDeg: number;
-  cx: number;
-  cy: number;
-}) {
-  const step = 360 / names.length;
-  return (
-    <g>
-      {names.map((name, i) => {
-        const angle = offsetDeg + i * step;
-        const label = name.toUpperCase();
-        return (
-          <g key={name} transform={`rotate(${angle} ${cx} ${cy})`}>
-            {/* light catch of the carved groove */}
-            <text
-              x={cx}
-              y={cy - radius}
-              textAnchor="middle"
-              fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
-              fontSize={fontSize}
-              fontWeight="600"
-              fill="#fff6da"
-              opacity="0.55"
-              transform="translate(0.8 1)"
-              style={{ letterSpacing: "1.1px" }}
-            >
-              {label}
-            </text>
-            {/* the incision itself */}
-            <text
-              x={cx}
-              y={cy - radius}
-              textAnchor="middle"
-              fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
-              fontSize={fontSize}
-              fontWeight="600"
-              fill="#3a2a14"
-              opacity="0.92"
-              style={{ letterSpacing: "1.1px" }}
-            >
-              {label}
-            </text>
-            {/* diamond separator at the half-step, optically centered on the
-                cap height of the neighboring names */}
-            <g transform={`rotate(${step / 2} ${cx} ${cy})`}>
-              <path
-                d={`M ${cx} ${cy - radius - 7} l 2.4 3.5 l -2.4 3.5 l -2.4 -3.5 Z`}
-                transform="translate(0 3.5)"
-                fill="#8a6a30"
-                opacity="0.5"
-              />
-            </g>
-          </g>
-        );
-      })}
-    </g>
-  );
+const BONE = "#f7f1e3"; // carved lettering — near-white bone for legibility
+const RECESS = "#17120d"; // the dark of the incision
+
+// Drum geometry (viewBox 600 × 470)
+const CX = 300;
+const CYT = 176; // top-face ellipse center
+const RX = 252; // drum radius
+const RY = 74; // perspective squash
+const BAND_H = 118; // visible thickness
+
+const DEG = Math.PI / 180;
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+// Three staggered rows around the thickness — ten names each, with small
+// diamond separators between them. Sequence ends with Roman Catholic.
+type BandItem = {
+  kind: "name" | "diamond";
+  label?: string;
+  angle: number;
+  dy: number;
+};
+
+const BAND_ROWS = [
+  { names: ringOuter, phase: 0, dy: 34 },
+  { names: ringMiddle, phase: 12, dy: 64 },
+  { names: ringInner, phase: 24, dy: 94 },
+];
+
+const BAND_ITEMS: BandItem[] = BAND_ROWS.flatMap((row) => {
+  const step = 360 / row.names.length;
+  return row.names.flatMap((name, i): BandItem[] => [
+    { kind: "name", label: name.toUpperCase(), angle: row.phase + i * step, dy: row.dy },
+    { kind: "diamond", angle: row.phase + i * step + step / 2, dy: row.dy },
+  ]);
+});
+
+// Where does an item at drum-angle θ sit on screen? Front face only.
+function bandPlacement(angleDeg: number, dy: number, turn: number) {
+  const theta = ((angleDeg - turn + 540) % 360) - 180;
+  const c = Math.cos(theta * DEG);
+  if (c <= 0.18) return null; // gone around the turn
+  const x = r2(CX + RX * Math.sin(theta * DEG));
+  // Key light — a soft vertical band left of center; names brighten as
+  // they pass through it, like stone catching a museum spot.
+  const lx = (x - (CX - 84)) / 150;
+  const light = Math.exp(-lx * lx) * 0.22;
+  // Fade steeply near the turn so lettering melts into shadow, never clips.
+  const edge = Math.min(1, (c - 0.18) / 0.26);
+  return {
+    x,
+    y: r2(CYT + RY * c + dy),
+    sx: r2(Math.max(c, 0.1)), // foreshortening
+    o: r2(Math.min(0.45 + 0.5 * c + light, 1) * (0.12 + 0.88 * edge)),
+  };
 }
 
 function CircleStone() {
-  const cx = 300;
-  const cy = 310;
-  const r = 266;
+  const itemRefs = useRef<(SVGGElement | null)[]>([]);
 
-  // Soft, deterministic limestone mottling (no randomness → no hydration drift)
-  const mottle = [
-    { x: -78, y: -104, rx: 86, ry: 56, c: "#cdbf9f", o: 0.18 },
-    { x: 108, y: 82, rx: 96, ry: 64, c: "#c3b390", o: 0.16 },
-    { x: -128, y: 132, rx: 60, ry: 42, c: "#bdac86", o: 0.16 },
-    { x: 84, y: -168, rx: 52, ry: 36, c: "#d4c8ab", o: 0.14 },
-  ];
+  // Slow, stately turn — one revolution every 200 s. Updates are written
+  // as CSS transforms (compositor-friendly) into a dedicated overlay SVG,
+  // so the displacement-filtered rock below is never re-rasterized.
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    const SPEED = 1.8; // degrees per second — slow enough to read
+    let raf = 0;
+    const t0 = performance.now();
+    const frame = (now: number) => {
+      const turn = (((now - t0) / 1000) * SPEED) % 360;
+      BAND_ITEMS.forEach((item, i) => {
+        const el = itemRefs.current[i];
+        if (!el) return;
+        const pos = bandPlacement(item.angle, item.dy, turn);
+        if (!pos) {
+          el.style.display = "none";
+        } else {
+          el.style.display = "";
+          el.style.transform = `translate(${pos.x}px, ${pos.y}px) scaleX(${pos.sx})`;
+          el.style.opacity = String(pos.o);
+        }
+      });
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   return (
-    <div className="relative mx-auto w-full max-w-[440px]">
+    <div className="relative mx-auto w-full max-w-[540px]">
+      {/* ── Layer 1 · the rock — static, displacement-filtered once ── */}
       <svg
-        viewBox="0 0 600 620"
+        viewBox="0 0 600 470"
         role="img"
-        aria-label="The Oneness Stone — a round commemorative limestone inscribed with the names of 30 Christian denominations, turning slowly like a millstone"
+        aria-label="The Oneness Stone — a round stone base engraved around its side with the names of 30 Christian denominations, turning slowly"
         className="relative block w-full"
-        style={{
-          filter:
-            "drop-shadow(0 4px 10px rgba(63,16,25,0.18)) drop-shadow(0 24px 42px rgba(63,16,25,0.25))",
-        }}
       >
         <defs>
-          {/* Warm gold glow behind the stone */}
-          <radialGradient id="osGlow" cx="0.5" cy="0.5" r="0.6">
-            <stop offset="0" stopColor="#e6c06a" stopOpacity="0.30" />
-            <stop offset="0.55" stopColor="#c8923a" stopOpacity="0.08" />
-            <stop offset="1" stopColor="#c8923a" stopOpacity="0" />
+          <radialGradient id="osTop" cx="0.38" cy="0.3" r="0.95">
+            <stop offset="0" stopColor="#9d8e79" />
+            <stop offset="0.4" stopColor="#80725f" />
+            <stop offset="0.75" stopColor="#5f5344" />
+            <stop offset="1" stopColor="#453b31" />
           </radialGradient>
-
-          {/* Pale Jerusalem-limestone face — cream, lit from upper-left */}
-          <radialGradient id="osFace" cx="0.36" cy="0.28" r="0.95">
-            <stop offset="0" stopColor="#f3ecdb" />
-            <stop offset="0.30" stopColor="#e8dcc4" />
-            <stop offset="0.60" stopColor="#d6c8a8" />
-            <stop offset="0.82" stopColor="#bba985" />
-            <stop offset="1" stopColor="#988970" />
-          </radialGradient>
-
-          {/* Dome shading — soft top-left light, warm lower-right shadow */}
-          <radialGradient id="osDome" cx="0.32" cy="0.26" r="1.0">
-            <stop offset="0" stopColor="#fffaf0" stopOpacity="0.34" />
-            <stop offset="0.4" stopColor="#fffaf0" stopOpacity="0" />
-            <stop offset="0.72" stopColor="#2a1810" stopOpacity="0" />
-            <stop offset="1" stopColor="#2a1810" stopOpacity="0.32" />
-          </radialGradient>
-
-          {/* Top sunlit rim + bottom shade */}
-          <linearGradient id="osTop" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#fdf3d6" stopOpacity="0.75" />
-            <stop offset="1" stopColor="#fdf3d6" stopOpacity="0" />
+          <linearGradient id="osWall" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#6e6252" />
+            <stop offset="0.6" stopColor="#4a4034" />
+            <stop offset="1" stopColor="#211b15" />
           </linearGradient>
-          <linearGradient id="osBot" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#2a1810" stopOpacity="0" />
-            <stop offset="1" stopColor="#2a1810" stopOpacity="0.4" />
+          <linearGradient id="osKey" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0.12" stopColor="#fff6dd" stopOpacity="0" />
+            <stop offset="0.34" stopColor="#fff6dd" stopOpacity="0.2" />
+            <stop offset="0.58" stopColor="#fff6dd" stopOpacity="0" />
           </linearGradient>
-
-          {/* Gilded ring — beveled gold band */}
-          <linearGradient id="osGold" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#f0d488" />
-            <stop offset="0.5" stopColor="#c8923a" />
-            <stop offset="1" stopColor="#8a6326" />
+          <linearGradient id="osSheen" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0.1" stopColor="#fffaf0" stopOpacity="0.16" />
+            <stop offset="0.45" stopColor="#fffaf0" stopOpacity="0.03" />
+            <stop offset="0.78" stopColor="#0e0a06" stopOpacity="0.14" />
           </linearGradient>
-
-          {/* Fine, refined limestone grain (low opacity) */}
-          <filter id="osGrain" x="-2%" y="-2%" width="104%" height="104%">
+          <linearGradient id="osTurnL" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#14100b" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#14100b" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="osTurnR" x1="1" y1="0" x2="0" y2="0">
+            <stop offset="0" stopColor="#14100b" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#14100b" stopOpacity="0" />
+          </linearGradient>
+          <filter id="osRough" x="-6%" y="-6%" width="112%" height="112%">
             <feTurbulence
               type="fractalNoise"
-              baseFrequency="0.9"
+              baseFrequency="0.02"
+              numOctaves="3"
+              seed="33"
+              result="n"
+            />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="3" />
+          </filter>
+          <filter id="osGrainD" x="-2%" y="-2%" width="104%" height="104%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.85"
               numOctaves="2"
-              seed="7"
+              seed="9"
             />
             <feColorMatrix
-              values="0 0 0 0 0.34
-                      0 0 0 0 0.28
-                      0 0 0 0 0.18
+              values="0 0 0 0 0.07
+                      0 0 0 0 0.06
+                      0 0 0 0 0.04
                       0 0 0 0.5 0"
             />
             <feComposite in2="SourceGraphic" operator="in" />
           </filter>
-
-          {/* Refined engraving for the static center hub — incised
-              letterpress with a light catch below-right. (Safe to use a
-              filter here because the hub does not animate.) */}
-          <filter id="osEngrave" x="-25%" y="-25%" width="150%" height="150%">
-            <feOffset in="SourceAlpha" dx="0.7" dy="0.9" result="dn" />
-            <feFlood floodColor="#fff4d4" floodOpacity="0.55" />
-            <feComposite in2="dn" operator="in" result="lite" />
-            <feOffset in="SourceAlpha" dx="-0.7" dy="-0.9" result="up" />
-            <feFlood floodColor="#1a1408" floodOpacity="0.55" />
-            <feComposite in2="up" operator="in" result="dark" />
-            <feGaussianBlur in="dark" stdDeviation="0.3" result="darkSoft" />
-            <feMerge>
-              <feMergeNode in="lite" />
-              <feMergeNode in="darkSoft" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+          <filter id="osBlotchD" x="-2%" y="-2%" width="104%" height="104%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.06"
+              numOctaves="2"
+              seed="27"
+            />
+            <feColorMatrix
+              values="0 0 0 0 0.58
+                      0 0 0 0 0.53
+                      0 0 0 0 0.44
+                      0 0 0 0.35 -0.07"
+            />
+            <feComposite in2="SourceGraphic" operator="in" />
           </filter>
-
-          <clipPath id="osClip">
-            <circle cx={cx} cy={cy} r={r} />
+          <radialGradient id="osShadow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stopColor="#241d14" stopOpacity="0.34" />
+            <stop offset="0.65" stopColor="#241d14" stopOpacity="0.14" />
+            <stop offset="1" stopColor="#241d14" stopOpacity="0" />
+          </radialGradient>
+          <clipPath id="osWallClip">
+            <path
+              d={`M ${CX - RX} ${CYT} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT} L ${CX + RX} ${CYT + BAND_H} A ${RX} ${RY} 0 0 1 ${CX - RX} ${CYT + BAND_H} Z`}
+            />
+          </clipPath>
+          <clipPath id="osTopClip">
+            <ellipse cx={CX} cy={CYT} rx={RX} ry={RY} />
+          </clipPath>
+          <clipPath id="osDrumClip">
+            <ellipse cx={CX} cy={CYT} rx={RX} ry={RY} />
+            <path
+              d={`M ${CX - RX} ${CYT} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT} L ${CX + RX} ${CYT + BAND_H} A ${RX} ${RY} 0 0 1 ${CX - RX} ${CYT + BAND_H} Z`}
+            />
           </clipPath>
         </defs>
 
-        {/* Soft glow + cast shadow */}
-        <ellipse cx={cx} cy={cy + 16} rx={r + 64} ry={r + 42} fill="url(#osGlow)" />
+        {/* Ground shadow — cast long to the right of the key light */}
         <ellipse
-          cx={cx}
-          cy={cy + r + 16}
-          rx={r * 0.82}
-          ry={13}
-          fill="#3f1019"
-          opacity="0.3"
+          cx={CX + 44}
+          cy={CYT + BAND_H + RY + 10}
+          rx={RX * 1.12}
+          ry={20}
+          fill="url(#osShadow)"
+        />
+        <ellipse
+          cx={CX + 10}
+          cy={CYT + BAND_H + RY + 2}
+          rx={RX * 0.82}
+          ry={9}
+          fill="#1c160f"
+          opacity="0.36"
         />
 
-        {/* Stone base */}
-        <circle cx={cx} cy={cy} r={r} fill="url(#osFace)" />
+        <g filter="url(#osRough)">
+          <path
+            d={`M ${CX - RX} ${CYT} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT} L ${CX + RX} ${CYT + BAND_H} A ${RX} ${RY} 0 0 1 ${CX - RX} ${CYT + BAND_H} Z`}
+            fill="url(#osWall)"
+          />
+          <g clipPath="url(#osWallClip)">
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osGrainD)" opacity="0.55" />
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osBlotchD)" opacity="0.5" />
+            <path
+              d={`M ${CX - RX} ${CYT + 46} A ${RX} ${RY * 1.02} 0 0 0 ${CX + RX} ${CYT + 46}`}
+              fill="none"
+              stroke="#211b14"
+              strokeWidth="0.9"
+              opacity="0.35"
+            />
+            <path
+              d={`M ${CX - RX} ${CYT + 84} A ${RX} ${RY * 1.04} 0 0 0 ${CX + RX} ${CYT + 84}`}
+              fill="none"
+              stroke="#211b14"
+              strokeWidth="0.8"
+              opacity="0.28"
+            />
+            <rect x={CX - RX} y={CYT - 4} width={RX * 2} height={BAND_H + RY + 8} fill="url(#osKey)" />
+            <rect x={CX - RX} y={CYT - 4} width={190} height={BAND_H + RY + 8} fill="url(#osTurnL)" />
+            <rect x={CX + RX - 190} y={CYT - 4} width={190} height={BAND_H + RY + 8} fill="url(#osTurnR)" />
+          </g>
+          <path
+            d={`M ${CX - RX} ${CYT + BAND_H} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT + BAND_H}`}
+            fill="none"
+            stroke="#14100b"
+            strokeWidth="1.4"
+            opacity="0.55"
+          />
 
-        {/* Interior, clipped to the disc */}
-        <g clipPath="url(#osClip)">
-          {/* ── THE ROTOR — everything that belongs to the rock itself
-              turns as one rigid body: mottling, veins, and the three
-              inscribed rings of names. ── */}
-          <g className="oneness-rotor">
-            {mottle.map((m, i) => (
-              <ellipse
-                key={`mottle-${i}`}
-                cx={cx + m.x}
-                cy={cy + m.y}
-                rx={m.rx}
-                ry={m.ry}
-                fill={m.c}
-                opacity={m.o}
+          <ellipse cx={CX} cy={CYT} rx={RX} ry={RY} fill="url(#osTop)" />
+          <ellipse cx={CX} cy={CYT} rx={RX} ry={RY} fill="url(#osSheen)" />
+          <g clipPath="url(#osTopClip)">
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osGrainD)" opacity="0.4" />
+            <rect x="0" y="0" width="600" height="470" fill="#000" filter="url(#osBlotchD)" opacity="0.26" />
+            <ellipse cx={CX - 92} cy={CYT - 16} rx={70} ry={22} fill="#8d816c" opacity="0.2" />
+            <ellipse cx={CX + 88} cy={CYT + 14} rx={64} ry={20} fill="#6e6250" opacity="0.22" />
+            <ellipse cx={CX - 10} cy={CYT + 34} rx={80} ry={18} fill="#4e463c" opacity="0.22" />
+            {[
+              [96, -34, 1.0, "#211c16"],
+              [178, -6, 0.7, "#a89a86"],
+              [420, -28, 1.1, "#211c16"],
+              [498, 6, 0.7, "#8d816c"],
+              [236, 30, 0.9, "#1a1610"],
+              [352, 38, 0.7, "#a89a86"],
+              [140, 26, 0.8, "#211c16"],
+              [462, 34, 0.8, "#1a1610"],
+            ].map(([dx, dy, r, c], i) => (
+              <circle
+                key={i}
+                cx={CX - 300 + Number(dx) + 100}
+                cy={CYT + Number(dy)}
+                r={Number(r)}
+                fill={String(c)}
+                opacity={0.4 + (i % 3) * 0.12}
               />
             ))}
-
-            {/* Faint hairline veins for character */}
-            <path
-              d={`M ${cx - 190} ${cy - 70} Q ${cx - 90} ${cy - 104} ${cx - 10} ${cy - 62} T ${cx + 160} ${cy - 30}`}
-              fill="none"
-              stroke="#9c8a64"
-              strokeWidth="0.7"
-              opacity="0.2"
-            />
-            <path
-              d={`M ${cx - 150} ${cy + 110} Q ${cx - 50} ${cy + 138} ${cx + 40} ${cy + 100} T ${cx + 185} ${cy + 74}`}
-              fill="none"
-              stroke="#9c8a64"
-              strokeWidth="0.6"
-              opacity="0.16"
-            />
-
-            {/* Three rings of inscribed names. The inner ring's offset
-                places Roman Catholic — last in the sequence — at the
-                bottom of the stone at rest. */}
-            <NameRing names={ringOuter} radius={218} fontSize={10.5} offsetDeg={180} cx={cx} cy={cy} />
-            <NameRing names={ringMiddle} radius={182} fontSize={10.5} offsetDeg={18} cx={cx} cy={cy} />
-            <NameRing names={ringInner} radius={146} fontSize={11} offsetDeg={0} cx={cx} cy={cy} />
           </g>
-
-          {/* ── STATIC LIGHT — grain, shade, and sunlit rim do not turn
-              with the rock; light stays where the sun is. ── */}
-          <rect
-            x="0"
-            y="0"
-            width="600"
-            height="620"
-            fill="#000"
-            filter="url(#osGrain)"
-            opacity="0.28"
-          />
-          <ellipse cx={cx} cy={cy + r - 28} rx={r - 4} ry={48} fill="url(#osBot)" />
-          <path
-            d={`M ${cx - r + 10} ${cy - 48} A ${r - 8} ${r - 8} 0 0 1 ${cx + r - 10} ${cy - 48}`}
+          <ellipse
+            cx={CX}
+            cy={CYT - 1}
+            rx={RX - 2}
+            ry={RY - 1}
             fill="none"
-            stroke="url(#osTop)"
-            strokeWidth="30"
-            opacity="0.6"
+            stroke="#cbbfa8"
+            strokeWidth="1"
+            opacity="0.3"
           />
-          <circle cx={cx} cy={cy} r={r} fill="url(#osDome)" />
+        </g>
+      </svg>
+
+      {/* ── Layer 2 · the moving band + dedication — no filters here, so
+          per-frame CSS transforms composite cleanly ── */}
+      <svg
+        viewBox="0 0 600 470"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 block h-full w-full"
+      >
+        <g clipPath="url(#osWallClip)">
+          {BAND_ITEMS.map((item, i) => {
+            const pos = bandPlacement(item.angle, item.dy, 0);
+            return (
+              <g
+                key={`${item.kind}-${i}`}
+                ref={(el) => {
+                  itemRefs.current[i] = el;
+                }}
+                style={{
+                  display: pos ? undefined : "none",
+                  transform: pos
+                    ? `translate(${pos.x}px, ${pos.y}px) scaleX(${pos.sx})`
+                    : undefined,
+                  opacity: pos ? pos.o : undefined,
+                }}
+              >
+                {item.kind === "name" ? (
+                  <>
+                    <text
+                      x={0.9}
+                      y={1.1}
+                      textAnchor="middle"
+                      fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
+                      fontSize="13.5"
+                      fontWeight="600"
+                      fill={RECESS}
+                      opacity="1"
+                      style={{ letterSpacing: "0.8px" }}
+                    >
+                      {item.label}
+                    </text>
+                    <text
+                      x={0}
+                      y={0}
+                      textAnchor="middle"
+                      fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
+                      fontSize="13.5"
+                      fontWeight="600"
+                      fill={BONE}
+                      style={{ letterSpacing: "0.8px" }}
+                    >
+                      {item.label}
+                    </text>
+                  </>
+                ) : (
+                  <path d="M 0 -6.4 L 1.8 -3.8 L 0 -1.2 L -1.8 -3.8 Z" fill={BONE} opacity="0.26" />
+                )}
+              </g>
+            );
+          })}
         </g>
 
-        {/* ─── Hand-cut outer edge ─── */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill="none"
-          stroke="#2a2114"
-          strokeWidth="2"
-          opacity="0.6"
+        <text
+          x={CX + 0.9}
+          y={CYT - 14.9}
+          textAnchor="middle"
+          fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
+          fontSize="17"
+          fontWeight="700"
+          fill={RECESS}
+          opacity="0.75"
+          style={{ letterSpacing: "4.5px" }}
+        >
+          THE ONENESS STONE
+        </text>
+        <text
+          x={CX}
+          y={CYT - 16}
+          textAnchor="middle"
+          fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
+          fontSize="17"
+          fontWeight="700"
+          fill="#f9f4e8"
+          style={{ letterSpacing: "4.5px" }}
+        >
+          THE ONENESS STONE
+        </text>
+        <line x1={CX - 52} y1={CYT + 2} x2={CX - 10} y2={CYT + 2} stroke={BONE} strokeWidth="0.8" opacity="0.5" />
+        <line x1={CX + 10} y1={CYT + 2} x2={CX + 52} y2={CYT + 2} stroke={BONE} strokeWidth="0.8" opacity="0.5" />
+        <path
+          d={`M ${CX} ${CYT - 2} L ${CX + 4} ${CYT + 2} L ${CX} ${CYT + 6} L ${CX - 4} ${CYT + 2} Z`}
+          fill="#b19277"
+          opacity="0.9"
         />
+        <text
+          x={CX + 0.7}
+          y={CYT + 26.9}
+          textAnchor="middle"
+          fontFamily="'Cormorant Garamond', serif"
+          fontSize="13.5"
+          fontWeight="700"
+          fill={RECESS}
+          opacity="0.75"
+          style={{ letterSpacing: "4px" }}
+        >
+          JOHN · 17 · 21
+        </text>
+        <text
+          x={CX}
+          y={CYT + 26}
+          textAnchor="middle"
+          fontFamily="'Cormorant Garamond', serif"
+          fontSize="13.5"
+          fontWeight="700"
+          fill="#f9f4e8"
+          style={{ letterSpacing: "4px" }}
+        >
+          JOHN · 17 · 21
+        </text>
+        <text
+          x={CX}
+          y={CYT + 48}
+          textAnchor="middle"
+          fontFamily="'Cormorant Garamond', serif"
+          fontSize="12"
+          fontStyle="italic"
+          fontWeight="600"
+          fill={BONE}
+          opacity="0.95"
+          style={{ letterSpacing: "0.5px" }}
+        >
+          “that they may all be one”
+        </text>
 
-        {/* ─── Gilded ring (channel + gold fill + highlight) ─── */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r - 16}
-          fill="none"
-          stroke="#2a2114"
-          strokeWidth="3.4"
-          opacity="0.5"
-        />
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r - 16}
-          fill="none"
-          stroke="url(#osGold)"
-          strokeWidth="2"
-        />
-        <circle
-          cx={cx}
-          cy={cy - 0.6}
-          r={r - 16}
-          fill="none"
-          stroke="#f4dd9a"
-          strokeWidth="0.7"
-          opacity="0.7"
-        />
-
-        {/* ─── The fixed center hub — the axle the millstone turns on ─── */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={114}
-          fill="none"
-          stroke="#5a4a2a"
-          strokeWidth="0.7"
-          opacity="0.45"
-        />
-        <circle
-          cx={cx}
-          cy={cy}
-          r={110}
-          fill="none"
-          stroke="#fbeec0"
-          strokeWidth="0.5"
-          opacity="0.4"
-        />
-
-        <g filter="url(#osEngrave)">
-          <text
-            x={cx}
-            y={cy - 16}
-            textAnchor="middle"
-            fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
-            fontSize="14"
-            fontWeight="700"
-            fill="#2a2418"
-            style={{ letterSpacing: "4px" }}
-          >
-            THE ONENESS STONE
-          </text>
-
-          {/* Divider with a gold diamond */}
-          <line
-            x1={cx - 64}
-            y1={cy + 4}
-            x2={cx - 10}
-            y2={cy + 4}
-            stroke="#2a2418"
-            strokeWidth="1"
-            opacity="0.7"
-          />
-          <line
-            x1={cx + 10}
-            y1={cy + 4}
-            x2={cx + 64}
-            y2={cy + 4}
-            stroke="#2a2418"
-            strokeWidth="1"
-            opacity="0.7"
-          />
-          <path
-            d={`M ${cx} ${cy - 0.5} L ${cx + 4.5} ${cy + 4} L ${cx} ${cy + 8.5} L ${cx - 4.5} ${cy + 4} Z`}
-            fill="#b8893a"
-          />
-
-          {/* Scripture reference */}
-          <text
-            x={cx}
-            y={cy + 32}
-            textAnchor="middle"
-            fontFamily="'Cormorant Garamond', serif"
-            fontSize="12.5"
-            fontWeight="700"
-            fill="#2a2418"
-            style={{ letterSpacing: "4px" }}
-          >
-            JOHN · 17 · 21
-          </text>
+        {/* ── Liquid glass — a slow sheen gliding across the drum, with
+            crisp screen-glass hairlines on the edges ── */}
+        <defs>
+          <linearGradient id="osLiquid" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.09" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <g clipPath="url(#osDrumClip)">
+          <g className="oneness-sheen">
+            <rect
+              x={CX - 90}
+              y={CYT - RY - 10}
+              width="180"
+              height={RY + BAND_H + RY + 20}
+              fill="url(#osLiquid)"
+              transform={`skewX(-14)`}
+            />
+          </g>
         </g>
+        <ellipse
+          cx={CX}
+          cy={CYT}
+          rx={RX}
+          ry={RY}
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="1"
+          opacity="0.16"
+        />
+        <path
+          d={`M ${CX - RX} ${CYT + BAND_H} A ${RX} ${RY} 0 0 0 ${CX + RX} ${CYT + BAND_H}`}
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="0.8"
+          opacity="0.1"
+        />
       </svg>
     </div>
   );

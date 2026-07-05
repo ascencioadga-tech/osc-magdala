@@ -84,9 +84,9 @@ export function Vision() {
       className="relative overflow-hidden bg-cream"
     >
       <div className="mx-auto max-w-7xl px-6 pb-10 pt-24 md:px-10 md:pb-14 md:pt-32">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-16 lg:gap-20">
-          {/* LEFT — vision text with animated highlights and scroll marker */}
-          <div className="relative">
+        <div className="grid gap-12 md:grid-cols-[1fr_1.4fr] md:items-center md:gap-16 lg:gap-20">
+          {/* RIGHT (desktop) — vision text with animated highlights */}
+          <div className="relative md:order-2">
             {/* Vertical scroll-progress marker on the left edge */}
             <div
               aria-hidden="true"
@@ -185,13 +185,10 @@ export function Vision() {
                             className={[
                               "rounded-full border px-4 py-1.5 text-[12px] font-medium tracking-wide transition",
                               isActive
-                                ? "border-burgundy bg-burgundy text-cream shadow-[0_6px_18px_-8px_rgba(106,32,69,0.55)]"
+                                ? "border-burgundy bg-burgundy text-cream shadow-[0_6px_18px_-8px_rgba(84,19,46,0.55)]"
                                 : "border-burgundy/25 text-burgundy/70 hover:border-burgundy/55 hover:text-burgundy",
                             ].join(" ")}
                           >
-                            <span className="mr-2 font-serif text-[11px] italic opacity-60">
-                              {String(i + 1).padStart(2, "0")}
-                            </span>
                             {c.label}
                           </button>
                         );
@@ -216,9 +213,17 @@ export function Vision() {
 
                     {/* Chapter progress + next */}
                     <div className="flex items-center justify-between border-t border-burgundy/10 pt-4">
-                      <span className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
-                        {String(chapter + 1).padStart(2, "0")} /{" "}
-                        {String(chapters.length).padStart(2, "0")}
+                      <span className="flex items-center gap-2">
+                        {chapters.map((_, i) => (
+                          <span
+                            key={i}
+                            aria-hidden="true"
+                            className={[
+                              "block h-1.5 w-1.5 rotate-45 transition-colors duration-300",
+                              i === chapter ? "bg-burgundy" : "bg-burgundy/20",
+                            ].join(" ")}
+                          />
+                        ))}
                       </span>
                       <button
                         type="button"
@@ -260,12 +265,13 @@ export function Vision() {
             </motion.div>
           </div>
 
-          {/* RIGHT — One Step Closer introduction video */}
+          {/* LEFT (desktop) — One Step Closer introduction video */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             animate={inView ? "show" : "hidden"}
             transition={{ duration: 0.9, delay: 0.4, ease: reverentEase }}
+            className="md:order-1"
           >
             <VideoPlayer
               src="/osc-vision.mp4"

@@ -23,7 +23,7 @@ export function Crossroads() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(70% 60% at 22% 18%, rgba(160,55,75,0.50) 0%, rgba(92,26,43,0) 60%), radial-gradient(80% 70% at 90% 90%, rgba(42,8,16,0.85) 0%, rgba(63,16,25,0) 70%), radial-gradient(60% 50% at 50% 50%, rgba(122,40,58,0.25) 0%, rgba(63,16,25,0) 70%)",
+            "radial-gradient(70% 60% at 22% 18%, rgba(160,55,75,0.50) 0%, rgba(107,36,64,0) 60%), radial-gradient(80% 70% at 90% 90%, rgba(41,8,24,0.85) 0%, rgba(63,14,34,0) 70%), radial-gradient(60% 50% at 50% 50%, rgba(122,40,58,0.25) 0%, rgba(63,14,34,0) 70%)",
         }}
       />
 
@@ -50,7 +50,7 @@ export function Crossroads() {
               width: e.size,
               height: e.size,
               filter: "blur(0.5px)",
-              boxShadow: "0 0 6px rgba(224,185,100,0.50)",
+              boxShadow: "0 0 6px rgba(177,146,119,0.50)",
               animationDuration: `${e.dur}s`,
               animationDelay: `${e.delay}s`,
             }}
@@ -67,15 +67,7 @@ export function Crossroads() {
               type="video/mp4"
               poster="/osc-intro-poster.jpg"
               label="One Step Closer intro video"
-              className="rounded-xl border border-cream/15 shadow-[0_24px_60px_-25px_rgba(0,0,0,0.55)]"
-            />
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -left-3 -top-3 h-5 w-5 border-l border-t border-gold-light/55"
-            />
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-3 -bottom-3 h-5 w-5 border-b border-r border-gold-light/55"
+              className="rounded-xl shadow-[0_24px_60px_-25px_rgba(0,0,0,0.55)]"
             />
           </div>
 

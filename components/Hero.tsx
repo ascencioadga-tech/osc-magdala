@@ -49,7 +49,7 @@ export function Hero() {
       ref={sectionRef}
       className="relative isolate overflow-hidden"
     >
-      {/* Background video + ceremonial burgundy gradient overlay */}
+      {/* Background video + muted maroon-grey overlay for legibility */}
       <div className="absolute inset-0 -z-10">
         {/* Autoplaying, muted background video — the Galilee still is the
             poster shown until the first frame is ready. */}
@@ -65,11 +65,22 @@ export function Hero() {
         >
           <source src="/magdala-crossroads-v2.mp4" type="video/mp4" />
         </video>
+        {/* Desaturated maroon-grey wash — weighted to the left so the
+            headline column sits on the darkest part and reads cleanly,
+            easing off toward the video on the right. */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 80% at 30% 20%, rgba(92,26,43,0.55) 0%, rgba(63,16,25,0.70) 60%, rgba(42,8,16,0.85) 100%)",
+              "linear-gradient(100deg, rgba(41,10,25,0.92) 0%, rgba(52,15,32,0.82) 38%, rgba(66,22,42,0.62) 62%, rgba(52,15,32,0.72) 100%)",
+          }}
+        />
+        {/* Gentle base vignette for the edges */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(30,8,19,0.45) 100%)",
           }}
         />
       </div>
@@ -87,6 +98,7 @@ export function Hero() {
               animate="show"
               transition={{ duration: 0.95, delay: 0.2, ease: reverentEase }}
               className="font-serif text-[40px] italic leading-[1.05] tracking-tight text-cream md:text-[68px] lg:text-[54px] xl:text-[64px]"
+              style={{ textShadow: "0 2px 26px rgba(0,0,0,0.5)" }}
             >
               {hero.tagline}
             </motion.h1>
@@ -97,7 +109,8 @@ export function Hero() {
               initial="hidden"
               animate="show"
               transition={{ duration: 0.8, delay: 1.3, ease: reverentEase }}
-              className="mt-7 max-w-xl text-base leading-relaxed text-cream/85 md:text-lg"
+              className="mt-7 max-w-xl text-base leading-relaxed text-cream/95 md:text-lg"
+              style={{ textShadow: "0 1px 10px rgba(0,0,0,0.45)" }}
             >
               {hero.intro}
             </motion.p>
@@ -112,11 +125,11 @@ export function Hero() {
             >
               <Link
                 href={hero.primaryCta.href}
-                className="group/cta relative inline-flex items-center justify-center overflow-hidden rounded-full bg-cream px-7 py-3.5 text-sm font-medium tracking-wide text-burgundy transition hover:text-burgundy-ink"
+                className="group/cta relative inline-flex items-center justify-center overflow-hidden rounded-full bg-cream px-7 py-3.5 text-sm font-medium tracking-wide text-burgundy transition-colors duration-500 hover:text-cream"
               >
                 <span
                   aria-hidden="true"
-                  className="absolute inset-0 -z-0 origin-left scale-x-0 bg-gold transition-transform duration-500 group-hover/cta:scale-x-100"
+                  className="absolute inset-0 -z-0 origin-left scale-x-0 bg-burgundy transition-transform duration-500 group-hover/cta:scale-x-100"
                 />
                 <span className="relative z-10">{hero.primaryCta.label}</span>
               </Link>
@@ -138,7 +151,7 @@ export function Hero() {
             >
               <span
                 aria-hidden="true"
-                className="block h-px w-8 bg-gold-light/70"
+                className="block h-px w-8 bg-cream/80"
               />
               <RotatingVoice />
             </motion.div>
@@ -152,24 +165,13 @@ export function Hero() {
             transition={{ duration: 0.9, delay: 0.55, ease: reverentEase }}
             className="mt-12 w-full lg:mt-0 lg:max-w-[82%] lg:ml-auto"
           >
-            <p className="eyebrow text-center text-gold-light/85 lg:text-left">
-              Magdala · Sea of Galilee
-            </p>
-
-            <div className="mt-4 md:mt-5">
-              <VideoPlayer
-                src="/fr-juan-osc.mp4"
-                type="video/mp4"
-                poster="/fr-juan-osc-poster.jpg"
-                label="Fr. Juan — the vision of One Step Closer"
-                className="rounded-xl border border-cream/15 shadow-[0_24px_60px_-25px_rgba(0,0,0,0.55)]"
-              />
-            </div>
-
-            <p className="font-serif mt-4 text-center text-sm italic text-cream/75 md:text-base lg:text-left">
-              Fr. Juan Solana, founder of Magdala — on the vision of One Step
-              Closer.
-            </p>
+            <VideoPlayer
+              src="/fr-juan-osc.mp4"
+              type="video/mp4"
+              poster="/fr-juan-osc-poster.jpg"
+              label="Fr. Juan — the vision of One Step Closer"
+              className="rounded-lg shadow-[0_30px_70px_-28px_rgba(41,8,24,0.7)]"
+            />
           </motion.div>
         </div>
       </motion.div>

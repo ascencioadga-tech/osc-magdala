@@ -15,7 +15,7 @@ export function TakeAStep() {
     <section
       id="take-a-step"
       ref={sectionRef}
-      className="relative overflow-hidden bg-parchment"
+      className="relative overflow-hidden bg-cream"
     >
       {/* Running stream backdrop */}
       <FlowingStreamBackground reveal={inView} />
@@ -51,21 +51,17 @@ export function TakeAStep() {
                 ease: reverentEase,
               }}
               whileHover={{ y: -6, transition: { duration: 0.3, ease: "easeOut" } }}
-              className="group relative flex flex-col rounded-2xl border border-line-soft bg-cream/95 p-8 backdrop-blur-sm shadow-[0_18px_48px_-30px_rgba(63,16,25,0.35)] transition hover:border-burgundy/40 hover:shadow-[0_30px_60px_-25px_rgba(63,16,25,0.40)] md:p-10"
-              style={{ borderTopWidth: 3, borderTopColor: "#C8923A" }}
+              className="group relative flex flex-col rounded-2xl border border-line-soft bg-cream/95 p-8 backdrop-blur-sm shadow-[0_18px_48px_-30px_rgba(63,14,34,0.35)] transition hover:border-burgundy/40 hover:shadow-[0_30px_60px_-25px_rgba(63,14,34,0.40)] md:p-10"
+              style={{ borderTopWidth: 3, borderTopColor: "#633511" }}
             >
-              {/* Number marker */}
-              <div className="font-display flex items-baseline gap-3">
-                <span className="text-5xl font-light text-burgundy/30">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="block h-px w-10 translate-y-[-0.5rem] bg-gold/70"
-                />
+              {/* Small mosaic accent — three hand-set tiles */}
+              <div aria-hidden="true" className="flex items-center gap-1.5">
+                <span className="block h-2 w-2 rotate-45 bg-burgundy" />
+                <span className="block h-1.5 w-1.5 rotate-45 bg-terracotta/80" />
+                <span className="block h-1 w-1 rotate-45 bg-burgundy/40" />
               </div>
 
-              <h3 className="font-display mt-6 text-2xl leading-tight text-burgundy md:text-[30px]">
+              <h3 className="font-display mt-5 text-2xl leading-tight text-burgundy md:text-[30px]">
                 {path.title}
               </h3>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-ink/80 md:text-base">
@@ -92,6 +88,9 @@ export function TakeAStep() {
 }
 
 // ─── Flowing stream background ─────────────────────────────────────────
+// The same water language as the Stepping Stones: depth gradient, filled
+// swell ribbons, irregular broken crests, and twinkling glints — kept
+// quieter here so the cards stay in front.
 
 function FlowingStreamBackground({ reveal }: { reveal: boolean }) {
   return (
@@ -109,18 +108,17 @@ function FlowingStreamBackground({ reveal }: { reveal: boolean }) {
       >
         <defs>
           <linearGradient id="tas-water-bg" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#ede0c4" stopOpacity="0" />
-            <stop offset="0.3" stopColor="#cdd9e4" stopOpacity="0.55" />
-            <stop offset="0.55" stopColor="#9eb7cb" stopOpacity="0.6" />
-            <stop offset="0.8" stopColor="#cdd9e4" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#ede0c4" stopOpacity="0" />
+            <stop offset="0" stopColor="#c9d8e2" stopOpacity="0" />
+            <stop offset="0.3" stopColor="#a7c0d1" stopOpacity="0.3" />
+            <stop offset="0.55" stopColor="#7b9cb2" stopOpacity="0.38" />
+            <stop offset="0.8" stopColor="#a7c0d1" stopOpacity="0.3" />
+            <stop offset="1" stopColor="#c9d8e2" stopOpacity="0" />
           </linearGradient>
         </defs>
 
-        {/* Water mass spans the section so the cards float over it */}
         <rect x="0" y="0" width="1200" height="720" fill="url(#tas-water-bg)" />
 
-        {/* DEEP back layer — slow flow */}
+        {/* Swell ribbons — slow deep layer */}
         <g>
           <animateTransform
             attributeName="transform"
@@ -128,14 +126,14 @@ function FlowingStreamBackground({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 0"
             to="-1200 0"
-            dur="42s"
+            dur="46s"
             repeatCount="indefinite"
           />
-          <BackWaves x={0} />
-          <BackWaves x={1200} />
+          <TasSwells x={0} />
+          <TasSwells x={1200} />
         </g>
 
-        {/* MID surface — wave lines */}
+        {/* Irregular crests — mid layer */}
         <g>
           <animateTransform
             attributeName="transform"
@@ -143,14 +141,14 @@ function FlowingStreamBackground({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 0"
             to="-1200 0"
-            dur="22s"
+            dur="26s"
             repeatCount="indefinite"
           />
-          <MidWaves x={0} />
-          <MidWaves x={1200} />
+          <TasCrests x={0} />
+          <TasCrests x={1200} />
         </g>
 
-        {/* FRONT particles — fastest, foam + current marks */}
+        {/* Glints — fast front layer */}
         <g>
           <animateTransform
             attributeName="transform"
@@ -158,102 +156,89 @@ function FlowingStreamBackground({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 0"
             to="-1200 0"
-            dur="13s"
+            dur="14s"
             repeatCount="indefinite"
           />
-          <FrontParticles x={0} />
-          <FrontParticles x={1200} />
+          <TasGlints x={0} />
+          <TasGlints x={1200} />
         </g>
       </svg>
     </motion.div>
   );
 }
 
-function BackWaves({ x }: { x: number }) {
+function TasSwells({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
       <path
-        d="M 0,260 Q 200,232 400,260 T 800,260 T 1200,260"
-        fill="none"
-        stroke="#6A2045"
-        strokeWidth="1.6"
-        strokeOpacity="0.18"
+        d="M 0,300 C 66,288 134,288 200,300 S 334,312 400,300 S 534,288 600,300 S 734,312 800,300 S 934,288 1000,300 S 1134,312 1200,300 L 1200,352 C 1134,342 1066,342 1000,352 S 866,362 800,352 S 666,342 600,352 S 466,362 400,352 S 266,342 200,352 S 66,362 0,352 Z"
+        fill="#7fa2bc"
+        opacity="0.14"
       />
       <path
-        d="M 0,360 Q 250,330 500,360 T 1000,360 T 1200,360"
-        fill="none"
-        stroke="#C8923A"
-        strokeWidth="1.5"
-        strokeOpacity="0.28"
-      />
-      <path
-        d="M 0,460 Q 220,432 440,460 T 880,460 T 1200,460"
-        fill="none"
-        stroke="#6A2045"
-        strokeWidth="1.6"
-        strokeOpacity="0.18"
+        d="M 0,452 C 50,442 100,442 150,452 S 250,462 300,452 S 400,442 450,452 S 550,462 600,452 S 700,442 750,452 S 850,462 900,452 S 1000,442 1050,452 S 1150,462 1200,452 L 1200,498 C 1150,490 1100,490 1050,498 S 950,506 900,498 S 800,490 750,498 S 650,506 600,498 S 500,490 450,498 S 350,506 300,498 S 200,490 150,498 S 50,506 0,498 Z"
+        fill="#476e8a"
+        opacity="0.16"
       />
     </g>
   );
 }
 
-function MidWaves({ x }: { x: number }) {
+function TasCrests({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
-      {[300, 340, 400, 450, 510, 560, 620, 680].map((y, i) => {
-        const stroke = i % 2 === 0 ? "#3E5C7A" : "#C8923A";
-        const opacity = 0.5 - (i % 3) * 0.06;
-        return (
-          <path
-            key={y}
-            d={`M 0,${y} Q 120,${y - 8} 240,${y} T 480,${y} T 720,${y} T 960,${y} T 1200,${y}`}
-            fill="none"
-            stroke={stroke}
-            strokeWidth="1"
-            strokeOpacity={opacity}
-          />
-        );
-      })}
+      <path
+        d="M 0,264 C 55,257 95,260 150,264 S 260,271 330,263 S 470,254 540,264 S 660,273 730,263 S 860,255 930,264 S 1090,272 1200,264"
+        fill="none"
+        stroke="#e4eef4"
+        strokeWidth="1"
+        strokeOpacity="0.35"
+        strokeDasharray="90 46"
+      />
+      <path
+        d="M 0,388 C 80,379 150,382 230,388 S 390,397 470,387 S 630,377 710,388 S 870,398 950,387 S 1110,379 1200,388"
+        fill="none"
+        stroke="#b9d0de"
+        strokeWidth="0.9"
+        strokeOpacity="0.3"
+        strokeDasharray="120 70"
+      />
+      <path
+        d="M 0,532 C 90,525 170,527 260,533 S 430,540 520,531 S 700,522 790,532 S 970,541 1060,531 L 1200,532"
+        fill="none"
+        stroke="#a5c0d1"
+        strokeWidth="0.9"
+        strokeOpacity="0.26"
+        strokeDasharray="70 90"
+      />
     </g>
   );
 }
 
-function FrontParticles({ x }: { x: number }) {
-  const dots: { x: number; y: number; r: number; c: string; o: number }[] = [
-    { x: 60, y: 320, r: 2.2, c: "#FAF5EA", o: 0.85 },
-    { x: 180, y: 400, r: 1.8, c: "#E0B964", o: 0.85 },
-    { x: 300, y: 360, r: 2.4, c: "#FAF5EA", o: 0.9 },
-    { x: 440, y: 500, r: 1.6, c: "#E0B964", o: 0.85 },
-    { x: 560, y: 380, r: 2.2, c: "#FAF5EA", o: 0.85 },
-    { x: 700, y: 460, r: 1.8, c: "#E0B964", o: 0.85 },
-    { x: 820, y: 340, r: 2.4, c: "#FAF5EA", o: 0.9 },
-    { x: 960, y: 480, r: 1.6, c: "#E0B964", o: 0.85 },
-    { x: 1080, y: 360, r: 2.2, c: "#FAF5EA", o: 0.85 },
-    { x: 1160, y: 440, r: 1.8, c: "#E0B964", o: 0.85 },
-  ];
-  const dashes: { x: number; y: number; w: number; c: string; o: number }[] = [
-    { x: 110, y: 380, w: 18, c: "#FAF5EA", o: 0.65 },
-    { x: 380, y: 440, w: 16, c: "#C8923A", o: 0.65 },
-    { x: 620, y: 320, w: 22, c: "#FAF5EA", o: 0.6 },
-    { x: 870, y: 420, w: 18, c: "#C8923A", o: 0.65 },
-    { x: 1100, y: 510, w: 18, c: "#FAF5EA", o: 0.65 },
-  ];
+const TAS_GLINTS: { x: number; y: number; w: number }[] = [
+  { x: 90, y: 322, w: 14 },
+  { x: 330, y: 420, w: 10 },
+  { x: 560, y: 300, w: 16 },
+  { x: 760, y: 472, w: 10 },
+  { x: 960, y: 356, w: 14 },
+  { x: 1130, y: 500, w: 10 },
+];
+
+function TasGlints({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
-      {dots.map((d, i) => (
-        <circle key={i} cx={d.x} cy={d.y} r={d.r} fill={d.c} opacity={d.o} />
-      ))}
-      {dashes.map((d, i) => (
+      {TAS_GLINTS.map((g, i) => (
         <line
           key={i}
-          x1={d.x}
-          y1={d.y}
-          x2={d.x + d.w}
-          y2={d.y}
-          stroke={d.c}
-          strokeWidth="2.6"
+          x1={g.x}
+          y1={g.y}
+          x2={g.x + g.w}
+          y2={g.y}
+          stroke="#fdfaf2"
+          strokeWidth="1.6"
           strokeLinecap="round"
-          opacity={d.o}
+          className="water-glint"
+          style={{ animationDelay: `${(i * 0.8) % 4.2}s` }}
         />
       ))}
     </g>

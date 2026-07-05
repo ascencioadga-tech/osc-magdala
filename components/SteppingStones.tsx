@@ -43,7 +43,7 @@ export function SteppingStones() {
           transition={{ duration: 0.85, delay: 0.1, ease: reverentEase }}
           className="font-display mt-4 max-w-2xl text-4xl leading-[1.05] text-burgundy md:text-[56px]"
         >
-          The path begins at Galilee.
+          The path begins in Galilee.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -51,8 +51,8 @@ export function SteppingStones() {
           transition={{ duration: 0.85, delay: 0.2, ease: reverentEase }}
           className="font-serif mt-5 max-w-xl text-xl italic leading-snug text-ink/75 md:text-2xl"
         >
-          Step on each stone to walk the path — from acting on Jesus&rsquo;
-          Oneness Prayer in Galilee to living his Oneness at home.
+          Step on each stone to walk the path from acting on Jesus&rsquo;
+          Oneness Prayer in Galilee to living oneness at home.
         </motion.p>
       </div>
 
@@ -77,7 +77,6 @@ export function SteppingStones() {
                 </li>
               ))}
             </ol>
-            <FootprintTrailHorizontal reveal={inView} />
           </div>
         </div>
 
@@ -103,13 +102,6 @@ export function SteppingStones() {
                     reveal={inView}
                   />
                 </div>
-                {i < stones.length - 1 ? (
-                  <FootprintMobile
-                    reveal={inView}
-                    delay={1.3 + i * 0.45}
-                    direction={i % 2 === 0 ? "left" : "right"}
-                  />
-                ) : null}
               </li>
             ))}
           </ol>
@@ -130,21 +122,34 @@ export function SteppingStones() {
               <StonePanel stone={stones[active - 1]} />
             </motion.div>
           ) : (
-            <motion.p
+            <motion.div
               key="hint"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.6, duration: 0.6 }}
-              className="font-serif mx-auto max-w-md text-center text-lg italic text-burgundy/75"
+              className="mx-auto flex max-w-md items-center justify-center gap-3.5"
             >
-              <span aria-hidden="true" className="mr-2 text-gold">
-                ✦
-              </span>
-              Tap a stone to step into the story.
-              <span aria-hidden="true" className="ml-2 text-gold">
-                ✦
-              </span>
-            </motion.p>
+              {/* A stone touching water — the ripple your tap will make */}
+              <svg
+                viewBox="0 0 40 40"
+                className="h-9 w-9 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="20" cy="20" r="4.5" fill="none" stroke="#7a95b0" strokeWidth="1">
+                  <animate attributeName="r" values="4.5;16" dur="2.8s" repeatCount="indefinite" />
+                  <animate attributeName="stroke-opacity" values="0.55;0" dur="2.8s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="20" cy="20" r="4.5" fill="none" stroke="#7a95b0" strokeWidth="1">
+                  <animate attributeName="r" values="4.5;16" dur="2.8s" begin="1.4s" repeatCount="indefinite" />
+                  <animate attributeName="stroke-opacity" values="0.55;0" dur="2.8s" begin="1.4s" repeatCount="indefinite" />
+                </circle>
+                <ellipse cx="20" cy="20" rx="5.5" ry="4.6" fill="#6e6252" />
+                <ellipse cx="18.6" cy="18.4" rx="2.6" ry="1.8" fill="#8d816c" opacity="0.65" />
+              </svg>
+              <p className="font-serif text-left text-lg italic leading-snug text-burgundy/80">
+                The path crosses the water &mdash; step onto the first stone.
+              </p>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
@@ -237,122 +242,193 @@ function StoneButton({
         {/* Reflection / shadow under stone in water */}
         <span
           aria-hidden="true"
-          className="absolute -bottom-2 left-1/2 h-3 w-[78%] -translate-x-1/2 rounded-full bg-burgundy-ink/45 blur-md"
+          className="absolute -bottom-2 left-1/2 h-3 w-[78%] -translate-x-1/2 rounded-full bg-[#16242e]/50 blur-md"
         />
 
-        {/* The stone itself */}
+        {/* The stone itself — natural river rock: taupe-grey basalt with a
+            displacement-roughened silhouette, mineral grain, a wet darkened
+            base where it meets the water, and foam lapping the waterline. */}
         <svg
           width="148"
           height="128"
           viewBox="0 0 112 100"
-          className="relative block"
+          className="relative block overflow-visible"
           style={{
-            filter:
-              "drop-shadow(0 10px 14px rgba(31,28,24,0.35)) drop-shadow(0 2px 0 rgba(255,255,255,0.10))",
+            filter: "drop-shadow(0 10px 14px rgba(20,26,30,0.4))",
           }}
         >
           <defs>
             <clipPath id={`${gid}-clip`}>
               <path d={path} />
             </clipPath>
+            {/* Natural stone body — lit upper-left, falling to deep umber */}
+            <radialGradient id={`${gid}-body`} cx="0.36" cy="0.28" r="1.0">
+              <stop offset="0" stopColor="#9a8b76" />
+              <stop offset="0.35" stopColor="#7a6c5b" />
+              <stop offset="0.65" stopColor="#574c40" />
+              <stop offset="0.85" stopColor="#3a322a" />
+              <stop offset="1" stopColor="#241f19" />
+            </radialGradient>
+            {/* Wet base — cool watery darkening on the lower third */}
+            <linearGradient id={`${gid}-wet`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0.5" stopColor="#101820" stopOpacity="0" />
+              <stop offset="0.74" stopColor="#101820" stopOpacity="0.34" />
+              <stop offset="1" stopColor="#0a1218" stopOpacity="0.62" />
+            </linearGradient>
+            {/* Diffuse skylight on the crown — broad, not glossy */}
+            <radialGradient id={`${gid}-light`} cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stopColor="#f4efe4" stopOpacity="0.22" />
+              <stop offset="0.7" stopColor="#f4efe4" stopOpacity="0.06" />
+              <stop offset="1" stopColor="#f4efe4" stopOpacity="0" />
+            </radialGradient>
+            {/* Roughen the vector silhouette into hewn rock */}
+            <filter id={`${gid}-rough`} x="-15%" y="-15%" width="130%" height="130%">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency={0.04 + (variant % 4) * 0.006}
+                numOctaves="3"
+                seed={21 + stone.number * 7}
+                result="n"
+              />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="5" />
+            </filter>
+            {/* Fine mineral grain */}
+            <filter id={`${gid}-grain`} x="-2%" y="-2%" width="104%" height="104%">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.85"
+                numOctaves="2"
+                seed={5 + stone.number}
+              />
+              <feColorMatrix
+                values="0 0 0 0 0.08
+                        0 0 0 0 0.07
+                        0 0 0 0 0.05
+                        0 0 0 0.55 0"
+              />
+              <feComposite in2="SourceGraphic" operator="in" />
+            </filter>
+            {/* Coarse weathering blotches */}
+            <filter id={`${gid}-blotch`} x="-2%" y="-2%" width="104%" height="104%">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.07"
+                numOctaves="2"
+                seed={40 + stone.number * 3}
+              />
+              <feColorMatrix
+                values="0 0 0 0 0.55
+                        0 0 0 0 0.5
+                        0 0 0 0 0.42
+                        0 0 0 0.4 -0.08"
+              />
+              <feComposite in2="SourceGraphic" operator="in" />
+            </filter>
           </defs>
 
-          {/* Water ripple ABOVE the stone, behind it visually */}
+          {/* Foam where the water laps the stone */}
           <ellipse
             cx="56"
-            cy="100"
-            rx="56"
-            ry="6"
+            cy="93"
+            rx="52"
+            ry="6.5"
             fill="none"
-            stroke="#e0b964"
-            strokeWidth="0.8"
+            stroke="#edf4f8"
+            strokeWidth="1.3"
             strokeOpacity="0.5"
           />
           <ellipse
             cx="56"
-            cy="106"
-            rx="42"
-            ry="4"
+            cy="97"
+            rx="40"
+            ry="4.5"
             fill="none"
-            stroke="#e0b964"
-            strokeWidth="0.7"
+            stroke="#dfeaf1"
+            strokeWidth="0.9"
             strokeOpacity="0.35"
+            strokeDasharray="10 7"
           />
 
-          {/* Stone body — solid dark fill so it reads as wet stone */}
-          <path
-            d={path}
-            fill={isActive ? "#4a2e1d" : "#3a1f12"}
-            stroke="#15090a"
-            strokeWidth="1.6"
-            strokeOpacity="0.85"
-          />
-          {/* Subtle bottom shadow inside the stone (water-side darker) */}
-          <ellipse
-            cx="56"
-            cy="78"
-            rx="46"
-            ry="14"
-            fill="#0a0303"
-            opacity="0.45"
-            clipPath={`url(#${gid}-clip)`}
-          />
-
-          {/* Sun-from-above highlight + texture, all clipped to stone shape */}
-          <g clipPath={`url(#${gid}-clip)`}>
-            {/* A small cream sheen ellipse at the top of the stone */}
-            <ellipse
-              cx="50"
-              cy="22"
-              rx="28"
-              ry="9"
-              fill="#fbf3df"
-              opacity="0.18"
-            />
-            {/* Top-edge highlight stroke — catches light along the upper rim */}
-            <path
-              d={path}
-              fill="none"
-              stroke="#cdb38a"
-              strokeWidth="1.6"
-              strokeOpacity="0.55"
-              transform="translate(0, -1.2)"
-            />
-            {/* Speckles — minerals / cracks */}
-            {[
-              [22, 38],
-              [44, 30],
-              [70, 34],
-              [88, 46],
-              [34, 52],
-              [60, 58],
-              [78, 62],
-              [26, 66],
-              [54, 72],
-              [82, 78],
-              [38, 78],
-            ].map(([x, y], i) => (
-              <circle
-                key={i}
-                cx={x}
-                cy={y}
-                r={i % 3 === 0 ? 1.1 : 0.7}
-                fill={i % 4 === 0 ? "#cdb38a" : "#0a0503"}
-                opacity={0.4 + (i % 3) * 0.1}
+          {/* Rock body + texture, silhouette roughened as one group */}
+          <g filter={`url(#${gid}-rough)`}>
+            <path d={path} fill={`url(#${gid}-body)`} />
+            <g clipPath={`url(#${gid}-clip)`}>
+              {/* weathering + grain */}
+              <rect x="0" y="0" width="112" height="100" fill="#000" filter={`url(#${gid}-blotch)`} opacity="0.5" />
+              <rect x="0" y="0" width="112" height="100" fill="#000" filter={`url(#${gid}-grain)`} opacity="0.5" />
+              {/* tonal mottling — lichen-grey patches */}
+              <ellipse cx="38" cy="34" rx="20" ry="12" fill="#8d816c" opacity="0.2" />
+              <ellipse cx="74" cy="56" rx="18" ry="11" fill="#6e6250" opacity="0.22" />
+              <ellipse cx="52" cy="74" rx="22" ry="10" fill="#4e463c" opacity="0.25" />
+              {/* speckles — mixed minerals */}
+              {[
+                [22, 38, 0.9, "#211c16"],
+                [44, 28, 0.7, "#a89a86"],
+                [70, 34, 1.0, "#211c16"],
+                [88, 46, 0.6, "#8d816c"],
+                [34, 52, 0.8, "#1a1610"],
+                [60, 56, 0.6, "#a89a86"],
+                [78, 64, 0.9, "#211c16"],
+                [28, 66, 0.6, "#8d816c"],
+                [54, 70, 0.8, "#1a1610"],
+                [82, 76, 0.6, "#211c16"],
+              ].map(([x, y, r, c], i) => (
+                <circle key={i} cx={x as number} cy={y as number} r={r as number} fill={c as string} opacity={0.4 + (i % 3) * 0.12} />
+              ))}
+              {/* hairline fissures */}
+              <path
+                d="M 28,32 q 14,7 26,3 q 12,-3 20,6"
+                fill="none"
+                stroke="#17120d"
+                strokeWidth="0.6"
+                strokeOpacity="0.4"
+                strokeLinecap="round"
               />
-            ))}
-            {/* A tiny crack line */}
-            <path
-              d="M 30,30 q 12,8 24,4 q 14,-2 22,8"
-              fill="none"
-              stroke="#0a0503"
-              strokeWidth="0.7"
-              strokeOpacity="0.45"
-              strokeLinecap="round"
-            />
+              <path
+                d="M 62,68 q 8,4 16,2"
+                fill="none"
+                stroke="#17120d"
+                strokeWidth="0.5"
+                strokeOpacity="0.32"
+                strokeLinecap="round"
+              />
+              {/* broad diffuse skylight */}
+              <ellipse cx="44" cy="26" rx="34" ry="18" fill={`url(#${gid}-light)`} />
+              {/* ambient occlusion pooling at the base */}
+              <ellipse cx="56" cy="84" rx="46" ry="16" fill="#0c1014" opacity="0.35" />
+              {/* wet darkening where the stone sits in water */}
+              <rect x="0" y="0" width="112" height="100" fill={`url(#${gid}-wet)`} />
+              {/* thin waterline sheen on the wet band */}
+              <path
+                d="M 12,66 Q 56,60 100,66"
+                fill="none"
+                stroke="#bcd3de"
+                strokeWidth="0.8"
+                strokeOpacity="0.3"
+              />
+              {/* active warmth — a candle-glow lift when selected */}
+              {isActive ? (
+                <rect x="0" y="0" width="112" height="100" fill="#b19277" opacity="0.12" />
+              ) : null}
+            </g>
           </g>
 
-          {/* Roman numeral — engraved-feel */}
+          {/* Roman numeral — chiselled into the face, natural bone tone */}
+          <text
+            x="56.8"
+            y="64.8"
+            textAnchor="middle"
+            fontFamily='"Cormorant Garamond", Georgia, serif'
+            fontSize="34"
+            fontWeight="600"
+            fontStyle="italic"
+            fill="#120e0a"
+            opacity="0.65"
+            style={{ letterSpacing: "0.02em" }}
+            aria-hidden="true"
+          >
+            {ROMAN[idx]}
+          </text>
           <text
             x="56"
             y="64"
@@ -361,12 +437,9 @@ function StoneButton({
             fontSize="34"
             fontWeight="600"
             fontStyle="italic"
-            fill="#e0b964"
-            opacity={isActive ? 1 : 0.92}
-            style={{
-              filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.55))",
-              letterSpacing: "0.02em",
-            }}
+            fill={isActive ? "#ece3d2" : "#d9cfbc"}
+            opacity="0.95"
+            style={{ letterSpacing: "0.02em" }}
           >
             {ROMAN[idx]}
           </text>
@@ -378,111 +451,102 @@ function StoneButton({
 }
 
 // ─── Water backdrops ──────────────────────────────────────────────────
+// Realistic layered water: a depth gradient, filled swell ribbons drifting
+// at three parallax speeds, irregular broken crest lines with a slow
+// vertical bob, a breathing sun-sheen, and twinkling specular glints.
+// All geometry is deterministic (no randomness → no hydration drift) and
+// every band repeats exactly at the tile width for a seamless SMIL loop.
 
-// ─── Stream content (drawn twice side-by-side for seamless looping) ───
-
-function HBackWaves({ x }: { x: number }) {
+/* Filled swell ribbons — the slow, deep layer. Ribbon edges repeat every
+   300 units, so tiles join invisibly at x = 1200. */
+function HSwells({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
-      {/* Slow, soft sweeping waves — back depth */}
       <path
-        d="M 0,140 Q 200,118 400,140 T 800,140 T 1200,140"
-        fill="none"
-        stroke="#faf5ea"
-        strokeWidth="1.8"
-        strokeOpacity="0.55"
+        d="M 0,150 C 50,140 100,140 150,150 S 250,160 300,150 S 400,140 450,150 S 550,160 600,150 S 700,140 750,150 S 850,160 900,150 S 1000,140 1050,150 S 1150,160 1200,150 L 1200,196 C 1150,188 1100,188 1050,196 S 950,204 900,196 S 800,188 750,196 S 650,204 600,196 S 500,188 450,196 S 350,204 300,196 S 200,188 150,196 S 50,204 0,196 Z"
+        fill="#7fa2bc"
+        opacity="0.20"
       />
       <path
-        d="M 0,210 Q 250,188 500,210 T 1000,210 T 1200,210"
-        fill="none"
-        stroke="#e0b964"
-        strokeWidth="1.4"
-        strokeOpacity="0.5"
-      />
-      <path
-        d="M 0,280 Q 220,258 440,280 T 880,280 T 1200,280"
-        fill="none"
-        stroke="#faf5ea"
-        strokeWidth="1.4"
-        strokeOpacity="0.45"
+        d="M 0,238 C 66,226 134,226 200,238 S 334,250 400,238 S 534,226 600,238 S 734,250 800,238 S 934,226 1000,238 S 1134,250 1200,238 L 1200,290 C 1134,280 1066,280 1000,290 S 866,300 800,290 S 666,280 600,290 S 466,300 400,290 S 266,280 200,290 S 66,300 0,290 Z"
+        fill="#476e8a"
+        opacity="0.24"
       />
     </g>
   );
 }
 
-function HMidWaves({ x }: { x: number }) {
+/* Irregular crest lines — the mid layer. Mixed wavelengths and broken
+   (dashed) crests read as real chop rather than pen lines. */
+function HCrests({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
-      {/* Medium wave lines — definite stream surface */}
       <path
-        d="M 0,118 Q 100,108 200,118 T 400,118 T 600,118 T 800,118 T 1000,118 T 1200,118"
+        d="M 0,124 C 55,117 95,120 150,124 S 260,131 330,123 S 470,114 540,124 S 660,133 730,123 S 860,115 930,124 S 1090,132 1200,124"
         fill="none"
-        stroke="#faf5ea"
-        strokeWidth="1.2"
-        strokeOpacity="0.7"
-      />
-      <path
-        d="M 0,176 Q 120,164 240,176 T 480,176 T 720,176 T 960,176 T 1200,176"
-        fill="none"
-        stroke="#e0b964"
+        stroke="#e4eef4"
         strokeWidth="1.1"
-        strokeOpacity="0.65"
+        strokeOpacity="0.4"
+        strokeDasharray="90 46"
       />
       <path
-        d="M 0,244 Q 110,232 220,244 T 440,244 T 660,244 T 880,244 T 1100,244 T 1200,244"
+        d="M 0,178 C 80,169 150,172 230,178 S 390,187 470,177 S 630,167 710,178 S 870,188 950,177 S 1110,169 1200,178"
         fill="none"
-        stroke="#faf5ea"
-        strokeWidth="1.2"
-        strokeOpacity="0.6"
+        stroke="#b9d0de"
+        strokeWidth="1"
+        strokeOpacity="0.34"
+        strokeDasharray="120 70"
       />
       <path
-        d="M 0,300 Q 130,290 260,300 T 520,300 T 780,300 T 1040,300 T 1200,300"
+        d="M 0,232 C 60,226 110,228 170,233 S 290,240 360,231 S 500,222 570,232 S 710,241 780,231 S 930,223 1010,232 S 1140,238 1200,232"
         fill="none"
-        stroke="#e0b964"
+        stroke="#d3e2eb"
         strokeWidth="0.9"
-        strokeOpacity="0.5"
+        strokeOpacity="0.3"
+      />
+      <path
+        d="M 0,282 C 90,275 170,277 260,283 S 430,290 520,281 S 700,272 790,282 S 970,291 1060,281 L 1200,282"
+        fill="none"
+        stroke="#a5c0d1"
+        strokeWidth="0.9"
+        strokeOpacity="0.28"
+        strokeDasharray="70 90"
       />
     </g>
   );
 }
 
-function HFrontParticles({ x }: { x: number }) {
-  // Foam dots and current dashes — fastest layer
-  const dots: { x: number; y: number; r: number; c: string; o: number }[] = [
-    { x: 60, y: 150, r: 1.6, c: "#faf5ea", o: 0.85 },
-    { x: 170, y: 200, r: 1.2, c: "#faf5ea", o: 0.75 },
-    { x: 290, y: 130, r: 1.8, c: "#faf5ea", o: 0.9 },
-    { x: 420, y: 230, r: 1.0, c: "#e0b964", o: 0.85 },
-    { x: 540, y: 175, r: 1.5, c: "#faf5ea", o: 0.8 },
-    { x: 680, y: 260, r: 1.3, c: "#faf5ea", o: 0.75 },
-    { x: 800, y: 145, r: 1.6, c: "#e0b964", o: 0.85 },
-    { x: 930, y: 215, r: 1.2, c: "#faf5ea", o: 0.8 },
-    { x: 1040, y: 285, r: 1.4, c: "#faf5ea", o: 0.7 },
-    { x: 1140, y: 165, r: 1.6, c: "#e0b964", o: 0.85 },
-  ];
-  const dashes: { x: number; y: number; w: number; c: string; o: number }[] = [
-    { x: 110, y: 175, w: 14, c: "#faf5ea", o: 0.7 },
-    { x: 350, y: 215, w: 10, c: "#e0b964", o: 0.7 },
-    { x: 580, y: 130, w: 16, c: "#faf5ea", o: 0.65 },
-    { x: 760, y: 240, w: 12, c: "#e0b964", o: 0.7 },
-    { x: 980, y: 175, w: 14, c: "#faf5ea", o: 0.7 },
-  ];
+/* Specular glints + drifting foam — the fast front layer. Each glint
+   twinkles on its own (deterministic) delay while the layer drifts. */
+const H_GLINTS: { x: number; y: number; w: number; warm?: boolean }[] = [
+  { x: 70, y: 146, w: 16 },
+  { x: 190, y: 214, w: 10, warm: true },
+  { x: 300, y: 132, w: 20 },
+  { x: 405, y: 246, w: 12 },
+  { x: 505, y: 176, w: 18, warm: true },
+  { x: 640, y: 268, w: 10 },
+  { x: 730, y: 150, w: 22 },
+  { x: 845, y: 226, w: 12, warm: true },
+  { x: 950, y: 186, w: 16 },
+  { x: 1060, y: 262, w: 10 },
+  { x: 1140, y: 156, w: 18, warm: true },
+];
+
+function HGlints({ x }: { x: number }) {
   return (
     <g transform={`translate(${x} 0)`}>
-      {dots.map((d, i) => (
-        <circle key={i} cx={d.x} cy={d.y} r={d.r} fill={d.c} opacity={d.o} />
-      ))}
-      {dashes.map((d, i) => (
+      {H_GLINTS.map((g, i) => (
         <line
           key={i}
-          x1={d.x}
-          y1={d.y}
-          x2={d.x + d.w}
-          y2={d.y}
-          stroke={d.c}
-          strokeWidth="2.2"
+          x1={g.x}
+          y1={g.y}
+          x2={g.x + g.w}
+          y2={g.y}
+          stroke={g.warm ? "#f2ece0" : "#fdfaf2"}
+          strokeWidth="1.8"
           strokeLinecap="round"
-          opacity={d.o}
+          className="water-glint"
+          style={{ animationDelay: `${(i * 0.7) % 4.2}s` }}
         />
       ))}
     </g>
@@ -505,28 +569,66 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
       >
         <defs>
           <linearGradient id="water-bg-h" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#cdd9e4" stopOpacity="0" />
-            <stop offset="0.18" stopColor="#9eb7cb" stopOpacity="0.42" />
-            <stop offset="0.45" stopColor="#5e7e9b" stopOpacity="0.7" />
-            <stop offset="0.78" stopColor="#3e5c7a" stopOpacity="0.85" />
-            <stop offset="1" stopColor="#1d4358" stopOpacity="0.55" />
+            <stop offset="0" stopColor="#c9d8e2" stopOpacity="0" />
+            <stop offset="0.12" stopColor="#a7c0d1" stopOpacity="0.55" />
+            <stop offset="0.36" stopColor="#7b9cb2" stopOpacity="0.82" />
+            <stop offset="0.6" stopColor="#587e97" stopOpacity="0.9" />
+            <stop offset="0.84" stopColor="#3d617a" stopOpacity="0.85" />
+            <stop offset="1" stopColor="#2c4c62" stopOpacity="0" />
           </linearGradient>
+          {/* Organic tonal patches — break up any banding so the surface
+              reads as moving water, not ruled stripes */}
+          <filter id="water-organic-h" x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.012 0.03"
+              numOctaves="2"
+              seed="11"
+            />
+            <feColorMatrix
+              values="0 0 0 0 0.13
+                      0 0 0 0 0.27
+                      0 0 0 0 0.36
+                      0 0 0 0.5 -0.06"
+            />
+            <feComposite in2="SourceGraphic" operator="in" />
+          </filter>
+          <filter id="water-organic-h2" x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.016 0.045"
+              numOctaves="2"
+              seed="29"
+            />
+            <feColorMatrix
+              values="0 0 0 0 0.87
+                      0 0 0 0 0.92
+                      0 0 0 0 0.95
+                      0 0 0 0.4 -0.08"
+            />
+            <feComposite in2="SourceGraphic" operator="in" />
+          </filter>
           <linearGradient id="water-edge-h" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#faf5ea" stopOpacity="0" />
-            <stop offset="0.1" stopColor="#faf5ea" stopOpacity="0.6" />
-            <stop offset="0.5" stopColor="#faf5ea" stopOpacity="0.8" />
-            <stop offset="0.9" stopColor="#faf5ea" stopOpacity="0.6" />
-            <stop offset="1" stopColor="#faf5ea" stopOpacity="0" />
+            <stop offset="0" stopColor="#f0efec" stopOpacity="0" />
+            <stop offset="0.1" stopColor="#f0efec" stopOpacity="0.55" />
+            <stop offset="0.5" stopColor="#f0efec" stopOpacity="0.75" />
+            <stop offset="0.9" stopColor="#f0efec" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#f0efec" stopOpacity="0" />
           </linearGradient>
+          <clipPath id="water-clip-h">
+            <rect x="0" y="80" width="1200" height="240" />
+          </clipPath>
+          <radialGradient id="water-sun-h" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stopColor="#fdf8ec" stopOpacity="0.32" />
+            <stop offset="0.55" stopColor="#fdf8ec" stopOpacity="0.10" />
+            <stop offset="1" stopColor="#fdf8ec" stopOpacity="0" />
+          </radialGradient>
         </defs>
 
-        {/* Stream bed — full width */}
-        <path
-          d="M 0,80 L 1200,80 L 1200,320 L 0,320 Z"
-          fill="url(#water-bg-h)"
-        />
+        {/* Water body */}
+        <path d="M 0,80 L 1200,80 L 1200,320 L 0,320 Z" fill="url(#water-bg-h)" />
 
-        {/* Top shoreline */}
+        {/* Shoreline */}
         <path
           d="M 0,84 Q 200,72 400,82 T 800,82 T 1200,82"
           fill="none"
@@ -534,37 +636,48 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
           strokeWidth="2"
         />
 
-        {/* DEEP back layer — slowest flow */}
-        <g>
-          <animateTransform
-            attributeName="transform"
-            attributeType="XML"
-            type="translate"
-            from="0 0"
-            to="-1200 0"
-            dur="38s"
-            repeatCount="indefinite"
-          />
-          <HBackWaves x={0} />
-          <HBackWaves x={1200} />
+        {/* Sky reflection — long soft streaks of light near the far shore */}
+        <ellipse cx="380" cy="122" rx="200" ry="10" fill="#eef5f9" opacity="0.12" />
+        <ellipse cx="820" cy="136" rx="260" ry="12" fill="#eef5f9" opacity="0.1" />
+        <ellipse cx="600" cy="108" rx="150" ry="7" fill="#f6fafc" opacity="0.14" />
+
+        {/* Drifting organic tone patches — two layers, opposite directions */}
+        <g clipPath="url(#water-clip-h)">
+          <g opacity="0.16">
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="translate"
+              from="0 0"
+              to="-1200 0"
+              dur="58s"
+              repeatCount="indefinite"
+            />
+            <rect x="0" y="80" width="2400" height="240" fill="#22455c" filter="url(#water-organic-h)" />
+          </g>
+          <g opacity="0.1">
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="translate"
+              from="-1200 0"
+              to="0 0"
+              dur="74s"
+              repeatCount="indefinite"
+            />
+            <rect x="0" y="80" width="2400" height="240" fill="#dfeaf1" filter="url(#water-organic-h2)" />
+          </g>
         </g>
 
-        {/* MID layer — wave surface */}
-        <g>
-          <animateTransform
-            attributeName="transform"
-            attributeType="XML"
-            type="translate"
-            from="0 0"
-            to="-1200 0"
-            dur="20s"
-            repeatCount="indefinite"
-          />
-          <HMidWaves x={0} />
-          <HMidWaves x={1200} />
+        {/* Sun-sheen — slow breathing patch of reflected light */}
+        <g
+          className="water-sheen"
+          style={{ transformBox: "view-box", transformOrigin: "50% 55%" }}
+        >
+          <ellipse cx="620" cy="198" rx="330" ry="104" fill="url(#water-sun-h)" />
         </g>
 
-        {/* FRONT particles — fastest, most graphic */}
+        {/* DEEP swells — slowest drift */}
         <g>
           <animateTransform
             attributeName="transform"
@@ -572,14 +685,139 @@ function WaterHorizontal({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 0"
             to="-1200 0"
-            dur="11s"
+            dur="44s"
             repeatCount="indefinite"
           />
-          <HFrontParticles x={0} />
-          <HFrontParticles x={1200} />
+          <HSwells x={0} />
+          <HSwells x={1200} />
+        </g>
+
+        {/* MID crests — drift + a slow vertical bob (nested transforms) */}
+        <g>
+          <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="translate"
+            values="0 0; 0 4; 0 0"
+            keyTimes="0; 0.5; 1"
+            dur="7s"
+            repeatCount="indefinite"
+          />
+          <g>
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="translate"
+              from="0 0"
+              to="-1200 0"
+              dur="24s"
+              repeatCount="indefinite"
+            />
+            <HCrests x={0} />
+            <HCrests x={1200} />
+          </g>
+        </g>
+
+        {/* FRONT glints — fastest drift, twinkling */}
+        <g>
+          <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="translate"
+            from="0 0"
+            to="-1200 0"
+            dur="13s"
+            repeatCount="indefinite"
+          />
+          <HGlints x={0} />
+          <HGlints x={1200} />
         </g>
       </svg>
     </motion.div>
+  );
+}
+
+/* Vertical (mobile) variants — the same layering rotated 90°. */
+function VSwells({ y }: { y: number }) {
+  return (
+    <g transform={`translate(0 ${y})`}>
+      <path
+        d="M 88,0 C 78,50 78,100 88,150 S 98,250 88,300 S 78,400 88,450 S 98,550 88,600 S 78,700 88,750 S 98,850 88,900 S 78,1000 88,1050 S 98,1150 88,1200 L 128,1200 C 120,1150 120,1100 128,1050 S 136,950 128,900 S 120,800 128,750 S 136,650 128,600 S 120,500 128,450 S 136,350 128,300 S 120,200 128,150 S 136,50 128,0 Z"
+        fill="#7fa2bc"
+        opacity="0.2"
+      />
+      <path
+        d="M 196,0 C 184,66 184,134 196,200 S 208,334 196,400 S 184,534 196,600 S 208,734 196,800 S 184,934 196,1000 S 208,1134 196,1200 L 244,1200 C 236,1134 236,1066 244,1000 S 252,866 244,800 S 236,666 244,600 S 252,466 244,400 S 236,266 244,200 S 252,66 244,0 Z"
+        fill="#476e8a"
+        opacity="0.24"
+      />
+    </g>
+  );
+}
+
+function VCrests({ y }: { y: number }) {
+  const lines = [
+    { x: 74, amp: 8, period: 260, color: "#e4eef4", w: 1.1, o: 0.38, dash: "80 44" },
+    { x: 138, amp: 10, period: 340, color: "#b9d0de", w: 1, o: 0.32, dash: "110 66" },
+    { x: 196, amp: 7, period: 210, color: "#d3e2eb", w: 0.9, o: 0.3, dash: "" },
+    { x: 250, amp: 9, period: 310, color: "#a5c0d1", w: 0.9, o: 0.27, dash: "64 84" },
+  ];
+  return (
+    <g transform={`translate(0 ${y})`}>
+      {lines.map((l, i) => {
+        const half = l.period / 2;
+        let d = `M ${l.x},0`;
+        for (let yy = 0; yy < 1200; yy += l.period) {
+          d += ` C ${l.x - l.amp},${yy + half * 0.33} ${l.x - l.amp},${yy + half * 0.66} ${l.x},${yy + half}`;
+          d += ` C ${l.x + l.amp},${yy + half + half * 0.33} ${l.x + l.amp},${yy + half + half * 0.66} ${l.x},${yy + l.period}`;
+        }
+        return (
+          <path
+            key={i}
+            d={d}
+            fill="none"
+            stroke={l.color}
+            strokeWidth={l.w}
+            strokeOpacity={l.o}
+            strokeDasharray={l.dash || undefined}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+const V_GLINTS: { x: number; y: number; w: number; warm?: boolean }[] = [
+  { x: 72, y: 110, w: 12 },
+  { x: 210, y: 220, w: 9, warm: true },
+  { x: 120, y: 340, w: 14 },
+  { x: 240, y: 470, w: 9 },
+  { x: 66, y: 580, w: 13, warm: true },
+  { x: 180, y: 700, w: 9 },
+  { x: 236, y: 820, w: 12, warm: true },
+  { x: 96, y: 930, w: 10 },
+  { x: 200, y: 1050, w: 13 },
+  { x: 130, y: 1150, w: 9, warm: true },
+];
+
+function VGlints({ y }: { y: number }) {
+  return (
+    <g transform={`translate(0 ${y})`}>
+      {V_GLINTS.map((g, i) => (
+        <line
+          key={i}
+          x1={g.x}
+          y1={g.y}
+          x2={g.x + g.w}
+          y2={g.y}
+          stroke={g.warm ? "#f2ece0" : "#fdfaf2"}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          className="water-glint"
+          style={{ animationDelay: `${(i * 0.9) % 4.2}s` }}
+        />
+      ))}
+    </g>
   );
 }
 
@@ -599,31 +837,29 @@ function WaterVertical({ reveal }: { reveal: boolean }) {
       >
         <defs>
           <linearGradient id="water-bg-v" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#cdd9e4" stopOpacity="0" />
-            <stop offset="0.12" stopColor="#9eb7cb" stopOpacity="0.45" />
-            <stop offset="0.5" stopColor="#3e5c7a" stopOpacity="0.78" />
-            <stop offset="0.88" stopColor="#9eb7cb" stopOpacity="0.45" />
-            <stop offset="1" stopColor="#cdd9e4" stopOpacity="0" />
+            <stop offset="0" stopColor="#c9d8e2" stopOpacity="0" />
+            <stop offset="0.14" stopColor="#a7c0d1" stopOpacity="0.55" />
+            <stop offset="0.5" stopColor="#587e97" stopOpacity="0.85" />
+            <stop offset="0.86" stopColor="#a7c0d1" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#c9d8e2" stopOpacity="0" />
           </linearGradient>
+          <radialGradient id="water-sun-v" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stopColor="#fdf8ec" stopOpacity="0.3" />
+            <stop offset="0.55" stopColor="#fdf8ec" stopOpacity="0.1" />
+            <stop offset="1" stopColor="#fdf8ec" stopOpacity="0" />
+          </radialGradient>
         </defs>
         <rect x="0" y="0" width="320" height="1200" fill="url(#water-bg-v)" />
 
-        {/* DEEP back waves — slow drift downward */}
-        <g>
-          <animateTransform
-            attributeName="transform"
-            attributeType="XML"
-            type="translate"
-            from="0 -1200"
-            to="0 0"
-            dur="38s"
-            repeatCount="indefinite"
-          />
-          <VBackWaves y={0} />
-          <VBackWaves y={1200} />
+        {/* Sun-sheen */}
+        <g
+          className="water-sheen"
+          style={{ transformBox: "view-box", transformOrigin: "50% 30%" }}
+        >
+          <ellipse cx="160" cy="360" rx="110" ry="290" fill="url(#water-sun-v)" />
         </g>
 
-        {/* MID wave lines — surface ripples */}
+        {/* DEEP swells — slow drift downstream */}
         <g>
           <animateTransform
             attributeName="transform"
@@ -631,14 +867,40 @@ function WaterVertical({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 -1200"
             to="0 0"
-            dur="20s"
+            dur="44s"
             repeatCount="indefinite"
           />
-          <VMidWaves y={0} />
-          <VMidWaves y={1200} />
+          <VSwells y={0} />
+          <VSwells y={1200} />
         </g>
 
-        {/* FRONT particles — foam and current marks */}
+        {/* MID crests — drift + sideways bob */}
+        <g>
+          <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="translate"
+            values="0 0; 3 0; 0 0"
+            keyTimes="0; 0.5; 1"
+            dur="7s"
+            repeatCount="indefinite"
+          />
+          <g>
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="translate"
+              from="0 -1200"
+              to="0 0"
+              dur="24s"
+              repeatCount="indefinite"
+            />
+            <VCrests y={0} />
+            <VCrests y={1200} />
+          </g>
+        </g>
+
+        {/* FRONT glints */}
         <g>
           <animateTransform
             attributeName="transform"
@@ -646,207 +908,14 @@ function WaterVertical({ reveal }: { reveal: boolean }) {
             type="translate"
             from="0 -1200"
             to="0 0"
-            dur="11s"
+            dur="13s"
             repeatCount="indefinite"
           />
-          <VFrontParticles y={0} />
-          <VFrontParticles y={1200} />
+          <VGlints y={0} />
+          <VGlints y={1200} />
         </g>
       </svg>
     </motion.div>
-  );
-}
-
-function VBackWaves({ y }: { y: number }) {
-  return (
-    <g transform={`translate(0 ${y})`}>
-      <path
-        d="M 30,160 Q 100,140 160,160 T 290,160"
-        fill="none"
-        stroke="#faf5ea"
-        strokeWidth="1.6"
-        strokeOpacity="0.55"
-      />
-      <path
-        d="M 30,420 Q 100,400 160,420 T 290,420"
-        fill="none"
-        stroke="#e0b964"
-        strokeWidth="1.4"
-        strokeOpacity="0.5"
-      />
-      <path
-        d="M 30,680 Q 100,660 160,680 T 290,680"
-        fill="none"
-        stroke="#faf5ea"
-        strokeWidth="1.6"
-        strokeOpacity="0.5"
-      />
-      <path
-        d="M 30,940 Q 100,920 160,940 T 290,940"
-        fill="none"
-        stroke="#e0b964"
-        strokeWidth="1.4"
-        strokeOpacity="0.45"
-      />
-    </g>
-  );
-}
-
-function VMidWaves({ y }: { y: number }) {
-  return (
-    <g transform={`translate(0 ${y})`}>
-      {Array.from({ length: 14 }).map((_, i) => {
-        const lineY = 80 + i * 88;
-        const stroke = i % 2 === 0 ? "#faf5ea" : "#e0b964";
-        const opacity = 0.65 - (i % 3) * 0.08;
-        return (
-          <path
-            key={i}
-            d={`M 20,${lineY} Q 90,${lineY - 12} 160,${lineY} T 300,${lineY}`}
-            fill="none"
-            stroke={stroke}
-            strokeWidth={i % 2 === 0 ? 1.2 : 1}
-            strokeOpacity={opacity}
-          />
-        );
-      })}
-    </g>
-  );
-}
-
-function VFrontParticles({ y }: { y: number }) {
-  const dots: { x: number; y: number; r: number; c: string; o: number }[] = [
-    { x: 70, y: 120, r: 1.6, c: "#faf5ea", o: 0.85 },
-    { x: 220, y: 200, r: 1.3, c: "#faf5ea", o: 0.75 },
-    { x: 110, y: 320, r: 1.8, c: "#e0b964", o: 0.85 },
-    { x: 250, y: 440, r: 1.1, c: "#faf5ea", o: 0.85 },
-    { x: 60, y: 540, r: 1.6, c: "#faf5ea", o: 0.8 },
-    { x: 180, y: 660, r: 1.4, c: "#e0b964", o: 0.85 },
-    { x: 240, y: 780, r: 1.2, c: "#faf5ea", o: 0.75 },
-    { x: 90, y: 880, r: 1.8, c: "#faf5ea", o: 0.85 },
-    { x: 200, y: 1000, r: 1.4, c: "#e0b964", o: 0.85 },
-    { x: 130, y: 1120, r: 1.6, c: "#faf5ea", o: 0.8 },
-  ];
-  const dashes: { x: number; y: number; w: number; c: string; o: number }[] = [
-    { x: 50, y: 240, w: 18, c: "#faf5ea", o: 0.7 },
-    { x: 200, y: 380, w: 14, c: "#e0b964", o: 0.7 },
-    { x: 90, y: 600, w: 20, c: "#faf5ea", o: 0.65 },
-    { x: 220, y: 740, w: 14, c: "#e0b964", o: 0.7 },
-    { x: 110, y: 940, w: 18, c: "#faf5ea", o: 0.7 },
-  ];
-  return (
-    <g transform={`translate(0 ${y})`}>
-      {dots.map((d, i) => (
-        <circle key={i} cx={d.x} cy={d.y} r={d.r} fill={d.c} opacity={d.o} />
-      ))}
-      {dashes.map((d, i) => (
-        <line
-          key={i}
-          x1={d.x}
-          y1={d.y}
-          x2={d.x + d.w}
-          y2={d.y}
-          stroke={d.c}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          opacity={d.o}
-        />
-      ))}
-    </g>
-  );
-}
-
-// ─── Footprints ──────────────────────────────────────────────────────
-
-function FootprintTrailHorizontal({ reveal }: { reveal: boolean }) {
-  // Walks across the path, alternating left/right between stones
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 top-1/2 mt-12 -translate-y-1/2"
-    >
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-12">
-        {Array.from({ length: 14 }).map((_, i) => (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={
-              reveal
-                ? { opacity: [0, 0.7, 0], scale: [0.6, 1, 1.1] }
-                : { opacity: 0 }
-            }
-            transition={{
-              duration: 1.0,
-              delay: 1.6 + i * 0.13,
-              ease: "easeOut",
-            }}
-            className={[
-              "inline-block",
-              i % 2 === 0 ? "translate-y-2" : "-translate-y-2",
-            ].join(" ")}
-            style={{ transform: `rotate(${i % 2 === 0 ? -8 : 8}deg)` }}
-          >
-            <FootprintIcon size={14} />
-          </motion.span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function FootprintMobile({
-  reveal,
-  delay,
-  direction,
-}: {
-  reveal: boolean;
-  delay: number;
-  direction: "left" | "right";
-}) {
-  return (
-    <div
-      aria-hidden="true"
-      className="my-4 flex flex-col items-center gap-1.5"
-    >
-      {[0, 1].map((i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: -6 }}
-          animate={reveal ? { opacity: [0, 0.7, 0], y: [-6, 4, 12] } : {}}
-          transition={{
-            duration: 1.4,
-            delay: delay + i * 0.35,
-            ease: "easeOut",
-          }}
-          className="inline-block"
-          style={{
-            transform: `translateX(${
-              (direction === "left" ? -1 : 1) * (i === 0 ? 6 : -6)
-            }px) rotate(${(direction === "left" ? -1 : 1) * (i === 0 ? -10 : 10)}deg)`,
-          }}
-        >
-          <FootprintIcon size={14} />
-        </motion.span>
-      ))}
-    </div>
-  );
-}
-
-function FootprintIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size * 1.4}
-      viewBox="0 0 14 20"
-      fill="none"
-      role="presentation"
-    >
-      <ellipse cx="7" cy="13" rx="4" ry="5" fill="#6A2045" opacity="0.55" />
-      <ellipse cx="4.5" cy="3.6" rx="1.3" ry="1.6" fill="#6A2045" opacity="0.55" />
-      <ellipse cx="8" cy="2.6" rx="1" ry="1.2" fill="#6A2045" opacity="0.55" />
-      <ellipse cx="10" cy="3.6" rx="0.85" ry="1" fill="#6A2045" opacity="0.55" />
-      <ellipse cx="11.5" cy="5.4" rx="0.7" ry="0.9" fill="#6A2045" opacity="0.55" />
-    </svg>
   );
 }
 
@@ -854,15 +923,17 @@ function FootprintIcon({ size = 14 }: { size?: number }) {
 
 function StonePanel({ stone }: { stone: StoneData }) {
   const [expanded, setExpanded] = useState(false);
+  const [genesisOpen, setGenesisOpen] = useState(false);
   const [sectionIndex, setSectionIndex] = useState(0);
   const panelId = `stone-${stone.number}-expand`;
+  const genesisId = `stone-${stone.number}-genesis`;
   const hasExpand = Boolean(stone.expand);
   const sectionCount = stone.expand?.sections.length ?? 0;
   const safeIndex = Math.min(sectionIndex, Math.max(sectionCount - 1, 0));
   const activeSection = stone.expand?.sections[safeIndex];
 
   return (
-    <div className="rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,16,25,0.25)] md:p-12">
+    <div className="rounded-2xl border border-line-soft bg-cream p-8 shadow-[0_30px_60px_-30px_rgba(63,14,34,0.25)] md:p-12">
       <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
         <div>
           <p className="eyebrow text-terracotta">
@@ -903,32 +974,54 @@ function StonePanel({ stone }: { stone: StoneData }) {
             </p>
           ) : null}
 
-          {hasExpand ? (
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              aria-expanded={expanded}
-              aria-controls={panelId}
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
-            >
-              {expanded ? "Show less" : stone.cta.label}
-              <motion.span
-                aria-hidden="true"
-                animate={{ rotate: expanded ? 180 : 0 }}
-                transition={{ duration: 0.4, ease: reverentEase }}
-                className="inline-block"
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            {hasExpand ? (
+              <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                aria-expanded={expanded}
+                aria-controls={panelId}
+                className="inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
               >
-                ↓
-              </motion.span>
-            </button>
-          ) : (
-            <Link
-              href={stone.cta.href}
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
-            >
-              {stone.cta.label} <span aria-hidden="true">→</span>
-            </Link>
-          )}
+                {expanded ? "Show less" : stone.cta.label}
+                <motion.span
+                  aria-hidden="true"
+                  animate={{ rotate: expanded ? 180 : 0 }}
+                  transition={{ duration: 0.4, ease: reverentEase }}
+                  className="inline-block"
+                >
+                  ↓
+                </motion.span>
+              </button>
+            ) : (
+              <Link
+                href={stone.cta.href}
+                className="inline-flex items-center gap-2 rounded-full bg-burgundy px-6 py-3 text-sm font-medium text-cream transition hover:bg-burgundy-deep"
+              >
+                {stone.cta.label} <span aria-hidden="true">→</span>
+              </Link>
+            )}
+
+            {stone.genesis ? (
+              <button
+                type="button"
+                onClick={() => setGenesisOpen((v) => !v)}
+                aria-expanded={genesisOpen}
+                aria-controls={genesisId}
+                className="inline-flex items-center gap-2 rounded-full border border-burgundy/40 px-6 py-3 text-sm font-medium text-burgundy transition hover:border-burgundy hover:bg-burgundy/5"
+              >
+                {stone.genesis.label}
+                <motion.span
+                  aria-hidden="true"
+                  animate={{ rotate: genesisOpen ? 180 : 0 }}
+                  transition={{ duration: 0.4, ease: reverentEase }}
+                  className="inline-block"
+                >
+                  ↓
+                </motion.span>
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {stone.youtube ? (
@@ -983,13 +1076,10 @@ function StonePanel({ stone }: { stone: StoneData }) {
                         className={[
                           "rounded-full border px-4 py-1.5 text-[12px] font-medium tracking-wide transition",
                           isActive
-                            ? "border-burgundy bg-burgundy text-cream shadow-[0_6px_18px_-8px_rgba(106,32,69,0.55)]"
+                            ? "border-burgundy bg-burgundy text-cream shadow-[0_6px_18px_-8px_rgba(84,19,46,0.55)]"
                             : "border-burgundy/25 text-burgundy/70 hover:border-burgundy/55 hover:text-burgundy",
                         ].join(" ")}
                       >
-                        <span className="mr-2 font-serif text-[11px] italic opacity-60">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
                         {s.label ?? s.heading}
                       </button>
                     );
@@ -1057,9 +1147,17 @@ function StonePanel({ stone }: { stone: StoneData }) {
 
                 {/* Progress + next */}
                 <div className="flex items-center justify-between border-t border-burgundy/10 pt-4">
-                  <span className="text-[11px] uppercase tracking-[0.22em] text-ink/55">
-                    {String(safeIndex + 1).padStart(2, "0")} /{" "}
-                    {String(sectionCount).padStart(2, "0")}
+                  <span className="flex items-center gap-2">
+                    {stone.expand.sections.map((_, i) => (
+                      <span
+                        key={i}
+                        aria-hidden="true"
+                        className={[
+                          "block h-1.5 w-1.5 rotate-45 transition-colors duration-300",
+                          i === safeIndex ? "bg-burgundy" : "bg-burgundy/20",
+                        ].join(" ")}
+                      />
+                    ))}
                   </span>
                   <button
                     type="button"
@@ -1078,6 +1176,36 @@ function StonePanel({ stone }: { stone: StoneData }) {
                   </button>
                 </div>
               </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      {/* Genesis Hospitality reveal — full-width below the grid */}
+      <AnimatePresence initial={false}>
+        {genesisOpen && stone.genesis ? (
+          <motion.div
+            key={genesisId}
+            id={genesisId}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.6, ease: reverentEase }}
+            className="overflow-hidden"
+          >
+            <div className="mt-10 border-t border-line-soft pt-8">
+              <div className="flex items-center gap-3">
+                <span aria-hidden="true" className="block h-px w-10 bg-gold" />
+                <p className="eyebrow text-terracotta">
+                  {stone.genesis.reference}
+                </p>
+              </div>
+              <p className="font-serif mt-5 max-w-3xl text-xl italic leading-[1.6] text-burgundy/90 md:text-2xl">
+                {stone.genesis.scripture}
+              </p>
+              <p className="font-serif mt-6 max-w-2xl text-base leading-[1.75] text-ink/80 md:text-lg">
+                {stone.genesis.note}
+              </p>
             </div>
           </motion.div>
         ) : null}
@@ -1134,7 +1262,7 @@ function StoneCarousel({
           showing, so every shot fills the box edge-to-edge with zero
           cropping. CSS transitions smooth the height change between slides. */}
       <div
-        className="relative w-full overflow-hidden rounded-xl bg-burgundy-ink shadow-[0_24px_50px_-28px_rgba(63,16,25,0.35)] transition-[aspect-ratio] duration-700 ease-out"
+        className="relative w-full overflow-hidden rounded-xl bg-[#16090f] shadow-[0_28px_64px_-28px_rgba(0,0,0,0.55)] ring-1 ring-white/10 transition-[aspect-ratio] duration-700 ease-out"
         style={{ aspectRatio: `${current.width} / ${current.height}` }}
       >
         <AnimatePresence initial={false} mode="sync">
@@ -1259,7 +1387,7 @@ function YouTubeStoneFrame({ url, label }: { url: string; label: string }) {
 
   if (!parsed) {
     return (
-      <div className="relative aspect-video overflow-hidden rounded-xl border border-line-soft bg-burgundy-ink">
+      <div className="relative aspect-video overflow-hidden rounded-xl bg-[#16090f] ring-1 ring-inset ring-white/10">
         <div className="grid h-full w-full place-items-center">
           <p className="font-serif text-sm italic text-cream/60">
             Video unavailable
@@ -1282,7 +1410,7 @@ function YouTubeStoneFrame({ url, label }: { url: string; label: string }) {
 
   return (
     <div className="relative">
-      <div className="relative aspect-video overflow-hidden rounded-xl border border-line-soft bg-burgundy-ink shadow-[0_24px_50px_-28px_rgba(63,16,25,0.35)]">
+      <div className="relative aspect-video overflow-hidden rounded-xl bg-[#16090f] shadow-[0_28px_64px_-28px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/10">
         <iframe
           src={src}
           title={label}
@@ -1293,15 +1421,6 @@ function YouTubeStoneFrame({ url, label }: { url: string; label: string }) {
           className="absolute inset-0 h-full w-full"
         />
       </div>
-      {/* Editorial corner ornaments — match the rest of the brand */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-3 -top-3 h-5 w-5 border-l border-t border-gold-light/55"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-3 -bottom-3 h-5 w-5 border-b border-r border-gold-light/55"
-      />
     </div>
   );
 }

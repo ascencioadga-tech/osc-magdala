@@ -93,7 +93,7 @@ function JournalCard({ post }: { post: MagdalaArticle }) {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(42,8,16,0) 55%, rgba(42,8,16,0.45) 100%)",
+              "linear-gradient(180deg, rgba(41,8,24,0) 55%, rgba(41,8,24,0.45) 100%)",
           }}
         />
       </div>

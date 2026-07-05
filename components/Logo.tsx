@@ -2,7 +2,7 @@
 // (the official artwork copied from osc-website).
 
 const C = {
-  burgundy: "#6A2045",
+  burgundy: "#54132e",
 };
 
 type MedallionProps = {
