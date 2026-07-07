@@ -25,3 +25,17 @@
   for = "/*.svg"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Private, password-gated campaign deck (client-side AES-encrypted).
+# Resolve the clean /plan URL to the deck, and keep the path out of search
+# engines with a header in addition to the in-page noindex meta.
+[[redirects]]
+  from = "/plan"
+  to = "/plan/index.html"
+  status = 200
+
+[[headers]]
+  for = "/plan/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
