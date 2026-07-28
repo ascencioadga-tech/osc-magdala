@@ -4,18 +4,24 @@ import { brand, nav } from "@/lib/content";
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-burgundy text-cream">
-      <div className="mx-auto max-w-7xl px-6 pt-6 md:px-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo-white.png"
-          alt="One Step Closer — Hospitality Together"
-          width={1400}
-          height={320}
-          className="h-11 w-auto md:h-12"
-        />
-      </div>
+      {/*
+        One row: the lockup, then Explore, Contact and From beside it. The
+        columns share a top edge so the three eyebrow labels sit on a single
+        line, and the logo is nudged down a hair to sit optically level with
+        them rather than mathematically level.
+      */}
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-8 px-6 py-8 md:grid-cols-4 md:gap-10 md:px-10">
+        <div className="col-span-2 md:col-span-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-white.png"
+            alt="One Step Closer — Hospitality Together"
+            width={1400}
+            height={320}
+            className="h-11 w-auto md:-mt-1 md:h-12"
+          />
+        </div>
 
-      <div className="mx-auto grid max-w-7xl gap-6 px-6 py-5 md:grid-cols-2 md:gap-10 md:px-10 md:py-6">
         <div>
           <div className="eyebrow text-gold-light">Explore</div>
           <ul className="mt-2 space-y-1 text-[13px]">
@@ -45,10 +51,13 @@ export function Footer() {
             </li>
             <li>Magdala, Galilee</li>
           </ul>
-          <div className="eyebrow mt-3.5 text-gold-light">From</div>
+        </div>
+
+        <div>
+          <div className="eyebrow text-gold-light">From</div>
           <Link
             href={brand.parentUrl}
-            className="mt-1.5 inline-flex items-center gap-1 text-[13px] text-cream/80 transition hover:text-gold-light"
+            className="mt-2 inline-flex items-center gap-1 text-[13px] text-cream/80 transition hover:text-gold-light"
           >
             magdala.org <span aria-hidden="true">↗</span>
           </Link>
