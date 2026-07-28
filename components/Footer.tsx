@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { brand, nav } from "@/lib/content";
 
+/*
+  Where the workspace lives. It is a separate deployment from this site, so the
+  address is configuration rather than a constant: set NEXT_PUBLIC_WORKSPACE_URL
+  on the host. The local default keeps the buttons working in development.
+*/
+const WORKSPACE_URL =
+  process.env.NEXT_PUBLIC_WORKSPACE_URL ?? "http://localhost:3022";
+
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-burgundy text-cream">
@@ -20,6 +28,28 @@ export function Footer() {
             height={320}
             className="h-11 w-auto md:-mt-1 md:h-12"
           />
+
+          {/*
+            Both of these live in the workspace app, which deploys separately.
+            The base URL comes from the environment so this never hardcodes a
+            hostname — set NEXT_PUBLIC_WORKSPACE_URL on the host once the
+            workspace is deployed.
+          */}
+          <div className="mt-5 flex flex-col items-start gap-2.5">
+            <a
+              href={`${WORKSPACE_URL}/welcome`}
+              className="inline-flex items-center rounded-full bg-cream px-5 py-2.5 text-[12.5px] font-medium text-burgundy transition hover:bg-gold-light"
+            >
+              Join Us
+            </a>
+            <a
+              href={`${WORKSPACE_URL}/workspace`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-cream/40 px-5 py-2.5 text-[12.5px] text-cream/85 transition hover:border-cream hover:bg-cream/10 hover:text-cream"
+            >
+              OSC Workspace
+              <span aria-hidden="true" className="text-cream/50">↗</span>
+            </a>
+          </div>
         </div>
 
         <div>
