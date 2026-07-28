@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createHmac } from "crypto";
-import { isDemo, verifyDemo, DEMO_COOKIE } from "../../../lib/demo";
+import { isDemo, verifyDemo, DEMO_COOKIE, DEMO_PASSWORD } from "../../../lib/demo";
 
 /*
   Demo sign-in. Only exists while WORKSPACE_DEMO=1 and no real Supabase
@@ -14,7 +14,7 @@ import { isDemo, verifyDemo, DEMO_COOKIE } from "../../../lib/demo";
 */
 
 export function demoToken(user: string) {
-  return createHmac("sha256", process.env.WORKSPACE_DEMO_PASSWORD ?? "")
+  return createHmac("sha256", DEMO_PASSWORD)
     .update(`osc-demo:${user.toLowerCase()}`)
     .digest("hex");
 }

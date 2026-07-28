@@ -24,20 +24,25 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /* Demo mode swaps Supabase auth for a username + password checked on the
    server. See lib/demo.ts — it is off unless explicitly enabled, and a real
    Supabase project disables it outright. */
-const DEMO = process.env.NEXT_PUBLIC_WORKSPACE_DEMO === "1";
-
 /*
-  Is there a real project behind this? Without one — and without demo mode —
-  there is nothing to sign in to, and constructing a Supabase client from
-  undefined values throws during render, turning this page into a 500 rather
-  than a login. So check first, and show an honest panel instead of a form
-  that cannot work.
+  Is there a real project behind this? Constructing a Supabase client from
+  undefined values throws during render — which is what turned this page into
+  a 500 on a deployment with no database.
 */
 const SUPABASE_READY = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
     !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"),
 );
+
+/*
+  Demo mode mirrors isDemo() in lib/demo.ts, derived from the same public
+  signal so the client and server always agree without a second variable to
+  keep in step: no real project means demo. NEXT_PUBLIC_WORKSPACE_DEMO="0"
+  forces it off.
+*/
+const DEMO =
+  process.env.NEXT_PUBLIC_WORKSPACE_DEMO === "0" ? false : !SUPABASE_READY;
 
 function LoginInner() {
   const params = useSearchParams();
@@ -284,9 +289,10 @@ function LoginInner() {
 
           {DEMO && (
             <p className="mt-6 rounded-[3px] border border-[#8a6746]/25 bg-[#efe6d3]/45 px-3 py-2 text-[11px] leading-relaxed text-[#633511]">
-              <b className="font-medium">Demo mode.</b> Sign-in only — no
-              database is connected yet, so the workspace opens empty. Turns
-              off automatically once the Supabase project is connected.
+              <b className="font-medium">Demo.</b> No database is connected, so
+              the workspace opens empty and nothing here is real. Sign in with
+              the credentials you were given. This turns off by itself the
+              moment a Supabase project is configured.
             </p>
           )}
 

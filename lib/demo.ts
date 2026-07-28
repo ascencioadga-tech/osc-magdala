@@ -9,12 +9,19 @@ import { FRIENDS } from "./demo-friends";
   This exists so the console can be *seen* without a database. It is a
   deliberate, loudly-marked side door, and it is built to fail closed:
 
-    • It is off unless WORKSPACE_DEMO === "1" in the environment.
-    • The moment a real NEXT_PUBLIC_SUPABASE_URL is configured, demo mode
-      refuses to engage (see isDemo below) — so it cannot survive into a
-      production deployment by being forgotten.
-    • The password lives in the environment, never in this file.
-    • It carries no people by default. The directory opens empty.
+    • It engages ONLY when no real Supabase project is configured. The
+      moment NEXT_PUBLIC_SUPABASE_URL points at a real project, demo mode
+      switches itself off — so it cannot survive into a real deployment by
+      being forgotten. Set WORKSPACE_DEMO=0 to force it off sooner.
+    • It carries no people. The directory opens empty, and there is no
+      database behind it, so there is nothing real here to expose.
+    • The credentials can be overridden by the environment; the fallback
+      below exists so a demo deployment works without configuring anything.
+
+  ⚠️ While this is on, the console is reachable by anyone with the address
+  and the demo password. That is acceptable *only* because it is empty and
+  database-less. Do not put a real person's details into a deployment
+  running in this mode.
 
   When the real Supabase project exists: delete WORKSPACE_DEMO from
   .env.local and this whole path goes dark. Deleting this file entirely is
@@ -23,19 +30,28 @@ import { FRIENDS } from "./demo-friends";
 
 export const DEMO_COOKIE = "osc_demo_session";
 
-/** True only when demo mode is explicitly on AND no real project is set. */
+/*
+  Demo mode is the fallback, not the opt-in: if there is no real database,
+  the console has nothing to protect and everything to demonstrate. An
+  explicit WORKSPACE_DEMO=0 forces it off.
+*/
 export function isDemo(): boolean {
-  if (process.env.WORKSPACE_DEMO !== "1") return false;
+  if (process.env.WORKSPACE_DEMO === "0") return false;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const real = url && !url.includes("placeholder");
-  return !real;
+  const realProject = Boolean(url) && !url.includes("placeholder");
+  return !realProject;
 }
 
+/** Overridable by the environment; the fallback lets a demo deploy work
+ *  without configuring anything. */
+export const DEMO_USER = process.env.WORKSPACE_DEMO_USER?.trim() || "Eamon";
+export const DEMO_PASSWORD = process.env.WORKSPACE_DEMO_PASSWORD || "Magdala!";
+
 export function verifyDemo(username: string, password: string): boolean {
-  const u = (process.env.WORKSPACE_DEMO_USER ?? "").trim().toLowerCase();
-  const p = process.env.WORKSPACE_DEMO_PASSWORD ?? "";
-  if (!u || !p) return false;
-  return username.trim().toLowerCase() === u && password === p;
+  return (
+    username.trim().toLowerCase() === DEMO_USER.toLowerCase() &&
+    password === DEMO_PASSWORD
+  );
 }
 
 export const DEMO_STAFF = {

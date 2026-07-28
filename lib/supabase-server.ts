@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHmac } from "crypto";
-import { isDemo, DEMO_COOKIE, DEMO_STAFF } from "./demo";
+import { isDemo, DEMO_COOKIE, DEMO_STAFF, DEMO_USER, DEMO_PASSWORD } from "./demo";
 
 /*
   Request-scoped Supabase client.
@@ -96,8 +96,8 @@ export async function requireStaff(): Promise<Staff> {
   if (isDemo()) {
     const jar = await cookies();
     const tok = jar.get(DEMO_COOKIE)?.value;
-    const expect = createHmac("sha256", process.env.WORKSPACE_DEMO_PASSWORD ?? "")
-      .update(`osc-demo:${(process.env.WORKSPACE_DEMO_USER ?? "").toLowerCase()}`)
+    const expect = createHmac("sha256", DEMO_PASSWORD)
+      .update(`osc-demo:${DEMO_USER.toLowerCase()}`)
       .digest("hex");
     if (tok && tok === expect) {
       return { id: "demo", active: true, ...DEMO_STAFF } as Staff;
