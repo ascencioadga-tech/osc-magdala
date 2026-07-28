@@ -285,3 +285,24 @@ body {
     animation: none !important;
   }
 }
+
+/* ── Workspace ────────────────────────────────────────────────────────────
+   The console shares this site's tokens (wine, gold, cream and ink are the
+   same values), so it needs almost nothing of its own. Only these. Nothing
+   here touches the public pages. */
+
+/* Tabular figures for counts and money. */
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Crisp, consistent focus on the console's controls. */
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-burgundy) 55%, transparent);
+  outline-offset: 2px;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible { outline: none; }
+
+/* The app-launcher carousel scrolls freely, with no visible scrollbar. */
+.ws-track { scrollbar-width: none; -ms-overflow-style: none; }
+.ws-track::-webkit-scrollbar { display: none; }
