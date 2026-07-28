@@ -19,6 +19,13 @@ import { isDemo, DEMO_COOKIE, DEMO_STAFF } from "./demo";
   signed-in user to run as.
 */
 
+/** True only when a real project is configured — not a placeholder. */
+export function supabaseReady() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return Boolean(url && key && !url.includes("placeholder"));
+}
+
 export async function getSupabaseServer() {
   const cookieStore = await cookies();
 
@@ -53,6 +60,9 @@ export type Staff = {
 
 /** The signed-in staff member, or null. Includes their role. */
 export async function getCurrentStaff() {
+  // No project configured: there is nobody to be. Say so rather than
+  // constructing a client from undefined values and throwing.
+  if (!supabaseReady()) return null;
   const db = await getSupabaseServer();
   const { data: { user } } = await db.auth.getUser();
   if (!user) return null;

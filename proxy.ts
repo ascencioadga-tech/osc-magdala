@@ -18,6 +18,19 @@ import { isDemo, DEMO_COOKIE } from "./lib/demo";
   real protection; this is the first door.
 */
 
+/*
+  Is a real Supabase project configured? Checked here rather than imported,
+  because proxy runs on the edge runtime and should pull in as little as
+  possible. Without it we must NOT construct a client: @supabase/ssr throws
+  "Your project's URL and Key are required", which turns every /workspace
+  request into a 500 rather than a login page.
+*/
+function supabaseReady() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return Boolean(url && key && !url.includes("placeholder"));
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname: path } = request.nextUrl;
 
@@ -39,6 +52,13 @@ export async function proxy(request: NextRequest) {
     }
     return NextResponse.next({ request });
   }
+
+  /*
+    Neither a database nor demo mode. Let the request through: the login page
+    renders an honest "not connected yet" panel, which is a great deal better
+    than a 500.
+  */
+  if (!supabaseReady()) return NextResponse.next({ request });
 
   let response = NextResponse.next({ request });
 

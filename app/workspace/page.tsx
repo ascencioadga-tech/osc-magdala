@@ -26,6 +26,19 @@ const EASE = [0.16, 1, 0.3, 1] as const;
    Supabase project disables it outright. */
 const DEMO = process.env.NEXT_PUBLIC_WORKSPACE_DEMO === "1";
 
+/*
+  Is there a real project behind this? Without one — and without demo mode —
+  there is nothing to sign in to, and constructing a Supabase client from
+  undefined values throws during render, turning this page into a 500 rather
+  than a login. So check first, and show an honest panel instead of a form
+  that cannot work.
+*/
+const SUPABASE_READY = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"),
+);
+
 function LoginInner() {
   const params = useSearchParams();
   const denied = params.get("denied") === "1";
@@ -37,10 +50,12 @@ function LoginInner() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
+  // Built lazily, and only when there is something to build it from.
+  const getSupabase = () =>
+    createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +77,7 @@ function LoginInner() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { error: authError } = await getSupabase().auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
@@ -87,7 +102,7 @@ function LoginInner() {
       setNotice("Enter your email above first, then ask for a reset link.");
       return;
     }
-    await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+    await getSupabase().auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: `${window.location.origin}/workspace`,
     });
     setNotice("If that address is on the team, a reset link is on its way.");
@@ -173,6 +188,18 @@ function LoginInner() {
             </div>
           )}
 
+          {!DEMO && !SUPABASE_READY ? (
+            <div className="mt-10 rounded-[4px] border border-[#8a6746]/30 bg-[#efe6d3]/55 px-5 py-5">
+              <p className="text-[14px] font-medium text-[#633511]">
+                The workspace isn&rsquo;t connected yet.
+              </p>
+              <p className="mt-2 text-[13.5px] leading-relaxed text-[#633511]/85">
+                Its database hasn&rsquo;t been set up on this deployment, so
+                there is nothing to sign in to. Everything else on the site
+                works normally.
+              </p>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="mt-10">
             <label className="block">
               <span className="mb-2.5 block text-[11px] uppercase tracking-[0.2em] text-[#2a1c14]/50">
@@ -245,6 +272,7 @@ function LoginInner() {
               {submitting ? "Signing in…" : "Sign In"}
             </button>
           </form>
+          )}
 
           <p className="mt-10 flex items-center gap-2 text-[11px] text-[#2a1c14]/40">
             <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">

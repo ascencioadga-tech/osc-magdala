@@ -1,5 +1,5 @@
 import "server-only";
-import { getSupabaseServer } from "./supabase-server";
+import { getSupabaseServer, supabaseReady } from "./supabase-server";
 import type { Member } from "./members";
 import { isDemo, demoMembers } from "./demo";
 
@@ -53,6 +53,17 @@ export type FetchMembersResult = {
 export async function fetchMembersResult(): Promise<FetchMembersResult> {
   // Demo mode short-circuits before Supabase is touched at all.
   if (isDemo()) return { members: demoMembers() };
+
+  /*
+    No project configured. This has to be checked HERE and not only in the
+    layout's requireStaff(), because Next renders a layout and its page
+    concurrently — so this query runs even on a request the layout is about
+    to redirect. Without the guard, creating a client from undefined values
+    throws and the whole route 500s instead of redirecting to the login.
+  */
+  if (!supabaseReady()) {
+    return { members: [], error: "The workspace database isn't connected yet." };
+  }
 
   const db = await getSupabaseServer();
 
