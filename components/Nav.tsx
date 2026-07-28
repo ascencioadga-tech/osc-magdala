@@ -61,20 +61,29 @@ export function Nav() {
             overHero ? "py-3 md:py-4" : "py-2 md:py-2.5",
           ].join(" ")}
         >
-        {/* Quiet text wordmark — the brand's one home in the chrome. The
-            fixed heights preserve the header's footprint (slimming ~30%
-            once scrolled). */}
+        {/* The lockup — the brand's one home in the chrome. Two files rather
+            than a CSS filter: the mark is line art, and a filtered white
+            version of the wine one loses the thin strokes. The fixed heights
+            preserve the header's footprint (slimming ~30% once scrolled). */}
         <Link
           href="/"
           aria-label="One Step Closer — home"
           className={[
-            "font-display flex items-center transition-all duration-300",
-            overHero
-              ? "h-20 text-xl text-cream md:h-24 md:text-2xl"
-              : "h-14 text-lg text-burgundy md:h-16 md:text-xl",
+            "flex items-center transition-all duration-300",
+            overHero ? "h-20 md:h-24" : "h-14 md:h-16",
           ].join(" ")}
         >
-          One Step Closer
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={overHero ? "/logo-white.png" : "/logo.png"}
+            alt="One Step Closer — Hospitality Together"
+            width={1400}
+            height={322}
+            className={[
+              "w-auto transition-all duration-300",
+              overHero ? "h-10 md:h-12" : "h-8 md:h-9",
+            ].join(" ")}
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">

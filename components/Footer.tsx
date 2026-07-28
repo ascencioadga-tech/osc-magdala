@@ -4,6 +4,17 @@ import { brand, nav } from "@/lib/content";
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-burgundy text-cream">
+      <div className="mx-auto max-w-7xl px-6 pt-6 md:px-10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-white.png"
+          alt="One Step Closer — Hospitality Together"
+          width={1400}
+          height={320}
+          className="h-11 w-auto md:h-12"
+        />
+      </div>
+
       <div className="mx-auto grid max-w-7xl gap-6 px-6 py-5 md:grid-cols-2 md:gap-10 md:px-10 md:py-6">
         <div>
           <div className="eyebrow text-gold-light">Explore</div>
