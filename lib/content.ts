@@ -84,7 +84,7 @@ export const stones: Stone[] = [
         "“If I have found favor in your eyes, my lord, do not pass your servant by. Let a little water be brought, and then you may all wash your feet and rest under this tree. Let me get you something to eat, so you can be refreshed and then go on your way — now that you have come to your servant.”",
       note: "Abraham & Sarah would need a restaurant in their backyard if they were catering to thousands of Galilee’s pilgrims!",
     },
-    body: "Jesus’ prayer for oneness still calls us forward. Built together by Christians from diverse traditions, the Restaurant Built Together witnesses permanently to John 17:20–23 — a monument to Christ’s prayer and a landmark beckoning us onward, renewed, one step closer in Christ.",
+    body: "Jesus’ prayer for oneness still calls us forward. Built together by Christians from diverse traditions, the OSC Landmark witnesses permanently to John 17:20–23 — a monument to Christ’s prayer and a landmark beckoning us onward, renewed, one step closer in Christ.",
     cta: { label: "Learn More", href: "#" },
     expand: {
       sections: [
@@ -136,7 +136,7 @@ export const stones: Stone[] = [
           blocks: [
             {
               paragraph:
-                "At Magdala, the Restaurant Built Together invites guests to experience Jesus’ prayer for oneness through hospitality.",
+                "At Magdala, the OSC Landmark invites guests to experience Jesus’ prayer for oneness through hospitality.",
             },
             {
               paragraph:

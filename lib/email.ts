@@ -59,7 +59,7 @@ export const BLOCK_LIBRARY: { kind: BlockKind; label: string; hint: string; live
   { kind: "spacer", label: "Spacer", hint: "Breathing room" },
   { kind: "sermon", label: "Featured Film", hint: "Fills itself from the film library", live: true },
   { kind: "events", label: "Gatherings", hint: "Fills itself from the calendar", live: true },
-  { kind: "mission", label: "The Mission", hint: "The Restaurant Built Together", live: true },
+  { kind: "mission", label: "The Mission", hint: "The OSC Landmark", live: true },
 ];
 
 let seq = 0;
@@ -193,7 +193,7 @@ export function renderBlock(b: Block, origin: string): string {
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#54132e;border-radius:4px;">
            <tr><td style="padding:30px 28px;">
              <p style="margin:0;font-family:${SANS};font-size:10px;letter-spacing:2.6px;text-transform:uppercase;color:rgba(250,248,242,0.55);">At Magdala &middot; Sea of Galilee</p>
-             <p style="margin:14px 0 0;font-family:${SERIF};font-size:30px;line-height:1.15;color:#faf8f2;">The Restaurant Built Together</p>
+             <p style="margin:14px 0 0;font-family:${SERIF};font-size:30px;line-height:1.15;color:#faf8f2;">The OSC Landmark</p>
              <p style="margin:12px 0 0;font-family:${SANS};font-size:14px;line-height:1.6;color:rgba(250,248,242,0.72);">A house on the shore where Christians of every tradition sit at one table &mdash; built together, so that what is built together is remembered together.</p>
            </td></tr>
          </table>`,
@@ -258,7 +258,7 @@ export function renderPlainText(draft: EmailDraft): string {
       upcomingEvents().slice(0, b.count).forEach((e) => lines.push(`- ${e.title} — ${e.cadence ?? e.dateLabel}, ${e.time}`));
       lines.push("");
     }
-    if (b.kind === "mission") lines.push("The Restaurant Built Together — a house on the shore at Magdala where Christians of every tradition sit at one table.", "");
+    if (b.kind === "mission") lines.push("The OSC Landmark — a house on the shore at Magdala where Christians of every tradition sit at one table.", "");
   }
   lines.push("---", "One Step Closer · Magdala, Sea of Galilee", "onestepcloser.org", "Unsubscribe: {{unsubscribe}}");
   return lines.join("\n");

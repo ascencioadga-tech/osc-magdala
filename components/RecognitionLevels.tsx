@@ -46,7 +46,7 @@ const levels: Level[] = [
         label: "A public sign",
         blocks: [
           {
-            p: "The Restaurant Built Together highlights Jesus’ prayer at the Last Supper. It stands as a public sign that Orthodox, Presbyterians, Methodists, Lutherans, Evangelicals, Armenians, Copts, Anglicans, Baptists, Pentecostals, Catholics, and many others can join in a visible act of collaboration.",
+            p: "The OSC Landmark highlights Jesus’ prayer at the Last Supper. It stands as a public sign that Orthodox, Presbyterians, Methodists, Lutherans, Evangelicals, Armenians, Copts, Anglicans, Baptists, Pentecostals, Catholics, and many others can join in a visible act of collaboration.",
           },
           {
             scripture:
@@ -80,7 +80,7 @@ const levels: Level[] = [
             p: "Your local church can become part of the visible response to Jesus’ prayer “that they may all be one” (John 17:20–23).",
           },
           {
-            p: "By helping build the Restaurant Built Together at Magdala, your faith community places a concrete sign of its faith on the shores of the Sea of Galilee. Pilgrims will see that your church did not merely speak about Christian oneness — it helped build a public witness to it.",
+            p: "By helping build the OSC Landmark at Magdala, your faith community places a concrete sign of its faith on the shores of the Sea of Galilee. Pilgrims will see that your church did not merely speak about Christian oneness — it helped build a public witness to it.",
           },
         ],
       },
@@ -125,7 +125,7 @@ const levels: Level[] = [
             p: "A family legacy is handed on not only by words, but by deeds of love.",
           },
           {
-            p: "By helping build the Restaurant Built Together at Magdala, your family becomes part of a lasting response to Jesus’ prayer “that they may all be one” (John 17:20–23). Your gift leaves a footprint at the Sea of Galilee, where future generations may come, pray, and remember: our family chose to help Christians walk one step closer in Christ.",
+            p: "By helping build the OSC Landmark at Magdala, your family becomes part of a lasting response to Jesus’ prayer “that they may all be one” (John 17:20–23). Your gift leaves a footprint at the Sea of Galilee, where future generations may come, pray, and remember: our family chose to help Christians walk one step closer in Christ.",
           },
         ],
       },
