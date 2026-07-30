@@ -21,19 +21,40 @@ export function Footer() {
             className="h-11 w-auto md:-mt-1 md:h-12"
           />
 
-          {/* Both live in this same app now, so these are plain routes. */}
-          <div className="mt-5 flex flex-col items-start gap-2.5">
+          {/*
+            All four live in this same app, so these are plain routes. A 2x2
+            grid rather than a stack or a free wrap: the brand column is a
+            quarter of the grid, so four stacked buttons make a tall thin
+            ladder, and letting them wrap naturally orphans the longest label
+            on a row of its own.
+
+            Join Us is solid because it is the public invitation; the other
+            three are the team's own doors and read as secondary.
+          */}
+          <div className="mt-5 grid max-w-[268px] grid-cols-2 gap-2">
             <Link
               href="/welcome"
-              className="inline-flex items-center rounded-full bg-cream px-5 py-2.5 text-[12.5px] font-medium text-burgundy transition hover:bg-gold-light"
+              className="inline-flex items-center justify-center rounded-full bg-cream px-3 py-2 text-center text-[12px] font-medium text-burgundy transition hover:bg-gold-light"
             >
               Join Us
             </Link>
             <Link
               href="/workspace"
-              className="inline-flex items-center rounded-full border border-cream/40 px-5 py-2.5 text-[12.5px] text-cream/85 transition hover:border-cream hover:bg-cream/10 hover:text-cream"
+              className="inline-flex items-center justify-center rounded-full border border-cream/40 px-3 py-2 text-center text-[12px] text-cream/85 transition hover:border-cream hover:bg-cream/10 hover:text-cream"
             >
-              OSC Workspace
+              Workspace
+            </Link>
+            <Link
+              href="/prospects"
+              className="inline-flex items-center justify-center rounded-full border border-cream/40 px-3 py-2 text-center text-[12px] text-cream/85 transition hover:border-cream hover:bg-cream/10 hover:text-cream"
+            >
+              Prospects
+            </Link>
+            <Link
+              href="/plan"
+              className="inline-flex items-center justify-center rounded-full border border-cream/40 px-3 py-2 text-center text-[12px] text-cream/85 transition hover:border-cream hover:bg-cream/10 hover:text-cream"
+            >
+              Campaign Plan
             </Link>
           </div>
         </div>
