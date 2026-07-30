@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Church Prospects</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface-1: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    /* One Step Closer — Magdala. A single wine ramp in place of the blue
+       one; everything else about this dashboard is deliberately unchanged. */
+    --series-1: #54132e;
+    --seq-250: #c9a9b5;
+    --seq-350: #a87a8c;
+    --seq-450: #8a4d64;
+    --seq-550: #6d2f47;
+    --seq-650: #54132e;
+    --good: #0ca30c;
+    --good-text: #006300;
+    --hover-wash: rgba(11,11,11,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface-1: #1a1a19;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255,255,255,0.10);
+      --series-1: #b19277;
+      --seq-250: #e0cdbb;
+      --seq-350: #c9a9b5;
+      --seq-450: #b1798e;
+      --seq-550: #8a4d64;
+      --seq-650: #6d2f47;
+      --good: #0ca30c;
+      --good-text: #0ca30c;
+      --hover-wash: rgba(255,255,255,0.05);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 24px 64px; }
+  header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  header p { color: var(--text-secondary); margin-top: 4px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 22px 0 14px; }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .tile .label { color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tile .value { font-size: 28px; font-weight: 700; margin-top: 2px; }
+  .tile .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  .statebar {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 14px;
+  }
+  .statebar h2 { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+  .sb-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .sb-label { width: 34px; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+  .sb-track { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .sb-fill { height: 14px; border-radius: 0 4px 4px 0; min-width: 2px; transition: width .25s ease; }
+  .sb-val { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin: 18px 0 12px;
+  }
+  .controls input[type="search"], .controls select {
+    background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 14px; font-family: inherit;
+  }
+  .controls input[type="search"] { flex: 1; min-width: 220px; }
+  .controls button {
+    background: var(--series-1); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 14px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .controls button:hover { filter: brightness(1.08); }
+  .count { color: var(--muted); font-size: 13px; margin-left: auto; }
+
+  .tablewrap { overflow-x: auto; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; }
+  table { width: 100%; border-collapse: collapse; min-width: 1080px; }
+  th {
+    text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em;
+    color: var(--muted); font-weight: 600; padding: 10px 12px;
+    border-bottom: 1px solid var(--baseline);
+    cursor: pointer; user-select: none; white-space: nowrap;
+    position: sticky; top: 0; background: var(--surface-1); z-index: 2;
+  }
+  th .arrow { font-size: 10px; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  tbody tr:hover { background: var(--hover-wash); }
+  tbody tr { cursor: pointer; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .church-name { font-weight: 600; }
+  .denom { color: var(--text-secondary); font-size: 12.5px; }
+  a { color: var(--series-1); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .noemail { color: var(--muted); font-style: italic; }
+  .chip {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 7px;
+    border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary);
+  }
+  .chip.pastor { color: var(--good-text); border-color: var(--good-text); }
+  /* First Wave marker — visible even when browsing the whole list */
+  .wave {
+    display: inline-block; margin-left: 7px; vertical-align: 1px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .02em;
+    padding: 1px 6px; border-radius: 999px;
+    background: var(--series-1); color: #fff;
+  }
+  .wave.w2 { background: var(--seq-650); }   /* second wave reads darker */
+  .copybtn {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text-secondary); font-size: 11px; padding: 1px 6px; cursor: pointer; margin-left: 6px;
+  }
+  .copybtn:hover { background: var(--hover-wash); }
+
+  /* sequence column */
+  .touch { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .logbtn {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text-secondary); font-size: 11.5px; font-weight: 600;
+    padding: 3px 9px; cursor: pointer; font-family: inherit;
+  }
+  .logbtn:hover:not(:disabled) { background: var(--hover-wash); color: var(--text-primary); }
+  .logbtn:disabled { opacity: .4; cursor: default; }
+  /* overdue is the only thing on this page that gets to shout */
+  .logbtn.hot { background: var(--series-1); border-color: var(--series-1); color: #fff; }
+  .touch-meta { font-size: 11.5px; color: var(--muted); }
+  .undobtn {
+    background: none; border: 0; color: var(--muted);
+    font-size: 13px; cursor: pointer; padding: 0 2px; line-height: 1;
+  }
+  .undobtn:hover { color: var(--text-primary); }
+  select.status {
+    background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 6px; padding: 3px 6px; font-size: 12px; font-family: inherit;
+  }
+  tr.detail-row td {
+    background: var(--hover-wash); font-size: 13px; color: var(--text-secondary);
+    padding: 12px 16px;
+  }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 24px; }
+  .detail-grid b { color: var(--text-primary); }
+  .empty {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+  }
+  .empty code {
+    font-family: ui-monospace, Menlo, monospace; font-size: 11.5px;
+    background: var(--hover-wash); padding: 1px 5px; border-radius: 4px;
+  }
+  footer { margin-top: 18px; color: var(--muted); font-size: 12px; }
+
+  .savestate { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .savestate.saving { color: var(--muted); }
+  .savestate.saved  { color: var(--good-text); }
+  .savestate.error  { color: #c0392b; font-weight: 700; }
+
+  /* The lockup sits above the title, quietly — this is a working tool, not
+     a brochure, so the branding stops at the logo and the accent colour. */
+  .brand { display: block; height: 30px; width: auto; margin-bottom: 12px; }
+  @media (prefers-color-scheme: dark) {
+    /* The wine lockup disappears on a dark ground; use the white one. */
+    .brand { content: url("logo-white.png"); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="brand" src="logo.png" alt="One Step Closer — Hospitality Together"
+         width="1400" height="322" />
+    <h1>Church Prospects</h1>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="statebar">
+    <h2>Churches by state</h2>
+    <div id="stateBars"></div>
+  </div>
+
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search church, city, zip, pastor, denomination…">
+    <select id="fState"><option value="">All states</option></select>
+    <select id="fDenom"><option value="">All denominations</option></select>
+    <select id="fEmail">
+      <option value="">Any email</option>
+      <option value="pastor">Pastor email</option>
+      <option value="general">General email</option>
+      <option value="none">No email</option>
+    </select>
+    <select id="fStatus">
+      <option value="">Any status</option>
+      <option>New</option><option>Contacted</option><option>Replied</option><option>Meeting</option><option>Pass</option>
+    </select>
+    <select id="fDue">
+      <option value="">Whole list</option>
+      <option value="due">Due today</option>
+      <option value="seq">In sequence</option>
+    </select>
+    <button id="exportBtn">Export CSV</button>
+    <span id="saveState" class="savestate"></span>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-k="name">Church <span class="arrow"></span></th>
+          <th data-k="city">City <span class="arrow"></span></th>
+          <th data-k="state">State <span class="arrow"></span></th>
+          <th data-k="zip">Zip <span class="arrow"></span></th>
+          <th data-k="denomination">Denomination <span class="arrow"></span></th>
+          <th data-k="size_estimate">Size <span class="arrow"></span></th>
+          <th data-k="pastor_name">Lead Pastor <span class="arrow"></span></th>
+          <th data-k="email">Email <span class="arrow"></span></th>
+          <th>Website</th>
+          <th>Sequence</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <footer>Click a row for source notes. Emails were taken from each church's own site — blank means none was published. Sequence and status are saved in this browser only.</footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+const DATA = (window.CHURCH_DATA || []).map((d, i) => ({ ...d, _id: d.website || d.name + i }));
+const $ = s => document.querySelector(s);
+/* ---- campaign state -----------------------------------------------------
+   Preferably campaign.json on disk, served by server.py: one file means one
+   truth on every browser, and it can be backed up. Browser storage meant
+   Chrome, Safari and the in-app browser each held a separate partial copy.
+
+   But this dashboard is also published as static files, where there is no
+   server.py to talk to. There we fall back to this browser's localStorage —
+   clearly labelled, so nobody mistakes a per-browser copy for the shared
+   file. Which mode is in use is decided at boot, by whether the API answers. */
+const statuses = {};
+const touches = {};
+const LOCAL_KEY = 'church-prospects-state';
+
+let saveTimer = null, saveFailed = false;
+/** true when there's no server.py behind us — set by boot(). */
+let localOnly = false;
+
+function persist() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    setSaveState('saving');
+    if (localOnly) {
+      try {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(
+          { touches, statuses, updated: new Date().toISOString() }));
+        saveFailed = false; setSaveState('savedLocal');
+      } catch (err) { saveFailed = true; setSaveState('error'); }
+      return;
+    }
+    try {
+      const res = await fetch('/api/campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ touches, statuses, updated: new Date().toISOString() }),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      saveFailed = false;
+      setSaveState('saved');
+    } catch (err) {
+      /* Never fail silently — a dashboard that looks saved but isn't is
+         worse than one that plainly says it didn't. */
+      saveFailed = true;
+      setSaveState('error');
+    }
+  }, 250);
+}
+const saveTouches = persist;
+
+/* First Wave — the 25 churches being contacted, in send order.
+   Matched on name + state because two churches on the list share a name.
+   Order here is the order they should go out: the first five are the
+   Arizona and New Mexico ones close enough to visit in person. */
+const WAVE_1 = [
+  // Cleared. Add the wave here in send order, as [name, state] pairs.
+];
+const waveKey = (n, s) => `${n.trim().toLowerCase()}|${s}`;
+/* Second Wave — the six states added 30 July, in send order. Scored for
+   congregational governance: appointed-pastor denominations (UMC, PCUSA,
+   ELCA, Episcopal) are excluded because the pastor who signs a three-year
+   commitment may be reassigned before it ends. */
+const WAVE_2 = [
+  // Cleared. Add the next wave here in send order, as [name, state] pairs.
+];
+
+const WAVE_1_SET = new Map(WAVE_1.map(([n, s], i) => [waveKey(n, s), i + 1]));
+const WAVE_2_SET = new Map(WAVE_2.map(([n, s], i) => [waveKey(n, s), i + 1]));
+
+/* wave() returns {n: 1|2, rank} so a church can only belong to one wave */
+const wave = d => {
+  const k = waveKey(d.name, d.state);
+  if (WAVE_1_SET.has(k)) return { n: 1, rank: WAVE_1_SET.get(k) };
+  if (WAVE_2_SET.has(k)) return { n: 2, rank: WAVE_2_SET.get(k) };
+  return null;
+};
+/* kept for the repair tool + any caller that just needs "is this in a wave" */
+const waveRank = d => (wave(d) || {}).rank || 0;
+
+const DAY = 86400000;
+const SCHEDULE = [0, 4, 11, 21];      // day of each touch, from first send
+const TOUCHES = SCHEDULE.length;      // 4: outreach + three follow-ups
+const today = () => new Date().toISOString().slice(0, 10);
+const daysSince = iso => Math.floor((Date.now() - new Date(iso + 'T00:00:00')) / DAY);
+
+/* what this church needs from you right now */
+function due(d) {
+  const t = touches[d._id];
+  const st = statuses[d._id] || 'New';
+  if (['Replied', 'Meeting', 'Pass'].includes(st)) return null;   // sequence over
+  if (!t || !t.n) return { label: 'send touch 1', overdue: true };
+  if (t.n >= TOUCHES) return null;
+  const wait = SCHEDULE[t.n] - SCHEDULE[t.n - 1];
+  const elapsed = daysSince(t.date);
+  return elapsed >= wait
+    ? { label: `send touch ${t.n + 1}`, overdue: true }
+    : { label: `touch ${t.n + 1} in ${wait - elapsed}d`, overdue: false };
+}
+
+let sortK = 'state', sortDir = 1, openDetail = null;
+
+const saveStatus = persist;
+
+/* the save indicator — the only way to know the file actually took it */
+function setSaveState(state) {
+  const el = $('#saveState');
+  if (!el) return;
+  el.className = 'savestate ' + state;
+  el.textContent = { saving: 'saving…', saved: 'saved to campaign.json',
+                     savedLocal: 'saved in this browser only',
+                     error: 'NOT SAVED — is server.py running?' }[state] || '';
+}
+
+function options() {
+  const states = [...new Set(DATA.map(d => d.state))].sort();
+  states.forEach(s => $('#fState').insertAdjacentHTML('beforeend', `<option>${s}</option>`));
+  const denoms = [...new Set(DATA.map(d => d.denomination))].sort();
+  denoms.forEach(d => $('#fDenom').insertAdjacentHTML('beforeend', `<option>${d}</option>`));
+}
+
+function tiles() {
+  const total = DATA.length;
+  // Counted, never hardcoded — the list grows by state and a fixed number
+  // here goes quietly wrong the moment it does.
+  const stateCount = new Set(DATA.map(d => d.state).filter(Boolean)).size;
+  const pastorEmails = DATA.filter(d => d.email_type === 'pastor').length;
+  const anyEmail = DATA.filter(d => d.email).length;
+  const contacted = DATA.filter(d => (touches[d._id] || {}).n).length;
+  const dueNow = DATA.filter(d => (due(d) || {}).overdue && (touches[d._id] || {}).n).length;
+  const replied = DATA.filter(d => ['Replied','Meeting'].includes(statuses[d._id])).length;
+  $('#tiles').innerHTML = `
+    <div class="tile"><div class="label">Churches</div><div class="value">${total}</div><div class="sub">across ${stateCount} state${stateCount === 1 ? '' : 's'}</div></div>
+    <div class="tile"><div class="label">With email</div><div class="value">${anyEmail}</div><div class="sub">${Math.round(anyEmail/Math.max(total,1)*100)}% of list · ${pastorEmails} pastor-direct</div></div>
+    <div class="tile"><div class="label">In sequence</div><div class="value">${contacted}</div><div class="sub">${total - contacted} not yet contacted</div></div>
+    <div class="tile"><div class="label">Due today</div><div class="value">${dueNow}</div><div class="sub">${replied} replied so far</div></div>`;
+}
+
+function stateBars() {
+  /* derived from the data, not a hardcoded list — new states appear
+     automatically as research lands */
+  const counts = [...new Set(DATA.map(d => d.state))]
+    .map(s => [s, DATA.filter(d => d.state === s).length])
+    .sort((a, b) => b[1] - a[1]);
+  const max = Math.max(...counts.map(c => c[1]), 1);
+  const shades = ['--seq-650','--seq-550','--seq-450','--seq-350','--seq-250'];
+  $('#stateBars').innerHTML = counts.map(([s, n], i) => `
+    <div class="sb-row">
+      <span class="sb-label">${s}</span>
+      <div class="sb-track">
+        <div class="sb-fill" style="width:${n/max*100}%;background:var(${shades[i % shades.length]})"></div>
+        <span class="sb-val">${n}</span>
+      </div>
+    </div>`).join('');
+}
+
+function filtered() {
+  const q = $('#q').value.trim().toLowerCase();
+  const st = $('#fState').value, dn = $('#fDenom').value, em = $('#fEmail').value, stat = $('#fStatus').value;
+  const dueMode = $('#fDue').value;
+  let rows = DATA.filter(d => {
+    /* "Due today" means a follow-up is owed on someone already in the
+       sequence — not every church you have never written to. Without the
+       in-sequence check this filter just returns the whole list. */
+    const inSeq = !!(touches[d._id] || {}).n;
+    if (dueMode === 'wave1' && (wave(d) || {}).n !== 1) return false;
+    if (dueMode === 'wave2' && (wave(d) || {}).n !== 2) return false;
+    if (dueMode === 'due' && !(inSeq && (due(d) || {}).overdue)) return false;
+    if (dueMode === 'seq' && !inSeq) return false;
+    if (st && d.state !== st) return false;
+    if (dn && d.denomination !== dn) return false;
+    if (em === 'pastor' && d.email_type !== 'pastor') return false;
+    if (em === 'general' && d.email_type !== 'general') return false;
+    if (em === 'none' && d.email) return false;
+    if (stat && (statuses[d._id] || 'New') !== stat) return false;
+    if (q) {
+      const hay = [d.name, d.city, d.zip, d.pastor_name, d.denomination, d.email].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  /* In a wave view the order IS the send order, so it overrides the column
+     sort — in wave one the first five are the ones close enough to visit. */
+  if (dueMode === 'wave1' || dueMode === 'wave2')
+    return rows.sort((a, b) => waveRank(a) - waveRank(b));
+  rows.sort((a, b) => {
+    const va = (a[sortK] || '').toString().toLowerCase(), vb = (b[sortK] || '').toString().toLowerCase();
+    return va < vb ? -sortDir : va > vb ? sortDir : 0;
+  });
+  return rows;
+}
+
+function esc(s) { return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function render() {
+  const rows = filtered();
+  $('#count').textContent = `${rows.length} of ${DATA.length}`;
+  document.querySelectorAll('th[data-k]').forEach(th => {
+    th.querySelector('.arrow').textContent = th.dataset.k === sortK ? (sortDir > 0 ? '▲' : '▼') : '';
+  });
+  if (!rows.length) {
+    $('#rows').innerHTML = `<tr><td colspan="11"><div class="empty">${DATA.length ? 'No churches match the current filters.' : 'Data is still being compiled — refresh shortly.'}</div></td></tr>`;
+    return;
+  }
+  $('#rows').innerHTML = rows.map(d => {
+    const url = d.website ? (d.website.startsWith('http') ? d.website : 'https://' + d.website) : '';
+    const host = url ? url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '') : '';
+    const emailCell = d.email
+      ? `<a href="mailto:${esc(d.email)}" onclick="event.stopPropagation()">${esc(d.email)}</a>
+         ${d.email_type === 'pastor' ? '<span class="chip pastor">pastor</span>' : ''}
+         <button class="copybtn" data-copy="${esc(d.email)}">copy</button>`
+      : `<span class="noemail">not published</span>`;
+    const st = statuses[d._id] || 'New';
+    const t = touches[d._id] || { n: 0 };
+    const nudge = due(d);
+    const touchCell = `
+      <div class="touch">
+        <!-- no inline stopPropagation: it would fire before the document
+             listener and swallow the click entirely. The handler stops
+             propagation itself, same as the copy button. -->
+        <button class="logbtn${nudge && nudge.overdue ? ' hot' : ''}" data-log="${esc(d._id)}"
+                ${t.n >= TOUCHES ? 'disabled' : ''}>
+          ${t.n >= TOUCHES ? 'done' : 'log ' + (t.n + 1)}
+        </button>
+        <span class="touch-meta">${
+          nudge ? esc(nudge.label) : (t.n ? `${t.n} sent` : '—')
+        }${t.date ? ` · ${esc(t.date.slice(5))}` : ''}</span>
+        ${t.n ? `<button class="undobtn" data-undo="${esc(d._id)}" title="undo last touch">↺</button>` : ''}
+      </div>`;
+    const detail = openDetail === d._id ? `
+      <tr class="detail-row"><td colspan="11">
+        <div class="detail-grid">
+          <div><b>Size source:</b> ${esc(d.size_source) || '—'}</div>
+          <div><b>Pastor title:</b> ${esc(d.pastor_title) || '—'}</div>
+          <div><b>Notes:</b> ${esc(d.notes) || '—'}</div>
+        </div>
+      </td></tr>` : '';
+    return `<tr data-id="${esc(d._id)}">
+      <td><span class="church-name">${esc(d.name)}</span>${
+        wave(d) ? `<span class="wave w${wave(d).n}" title="Wave ${wave(d).n} — send order">W${wave(d).n}·${wave(d).rank}</span>` : ''
+      }</td>
+      <td>${esc(d.city)}</td>
+      <td>${esc(d.state)}</td>
+      <td class="num">${esc(d.zip)}</td>
+      <td class="denom">${esc(d.denomination)}</td>
+      <td>${esc(d.size_estimate)}</td>
+      <td>${esc(d.pastor_name)}</td>
+      <td>${emailCell}</td>
+      <td>${url ? `<a href="${esc(url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(host)}</a>` : '—'}</td>
+      <td>${touchCell}</td>
+      <td><select class="status" data-status="${esc(d._id)}" onclick="event.stopPropagation()">
+        ${['New','Contacted','Replied','Meeting','Pass'].map(o => `<option ${o===st?'selected':''}>${o}</option>`).join('')}
+      </select></td>
+    </tr>${detail}`;
+  }).join('');
+}
+
+document.addEventListener('click', e => {
+  const log = e.target.closest('[data-log]');
+  if (log) {
+    e.stopPropagation();
+    const id = log.dataset.log;
+    const t = touches[id] || { n: 0 };
+    touches[id] = { n: t.n + 1, date: today() };
+    // first touch also moves them out of "New"
+    if (t.n === 0 && (statuses[id] || 'New') === 'New') { statuses[id] = 'Contacted'; saveStatus(); }
+    saveTouches(); tiles(); render();
+    return;
+  }
+  const undo = e.target.closest('[data-undo]');
+  if (undo) {
+    e.stopPropagation();
+    const id = undo.dataset.undo;
+    const t = touches[id];
+    if (t && t.n > 0) { t.n -= 1; if (!t.n) delete touches[id]; saveTouches(); tiles(); render(); }
+    return;
+  }
+  const copy = e.target.closest('.copybtn');
+  if (copy) {
+    e.stopPropagation();
+    navigator.clipboard.writeText(copy.dataset.copy);
+    copy.textContent = '✓'; setTimeout(() => copy.textContent = 'copy', 900);
+    return;
+  }
+  const th = e.target.closest('th[data-k]');
+  if (th) {
+    if (sortK === th.dataset.k) sortDir *= -1; else { sortK = th.dataset.k; sortDir = 1; }
+    render(); return;
+  }
+  const tr = e.target.closest('tr[data-id]');
+  if (tr) {
+    openDetail = openDetail === tr.dataset.id ? null : tr.dataset.id;
+    render();
+  }
+});
+document.addEventListener('change', e => {
+  if (e.target.matches('select.status')) {
+    statuses[e.target.dataset.status] = e.target.value;
+    saveStatus(); tiles();
+    return;
+  }
+  if (e.target.closest('.controls')) render();
+});
+$('#q').addEventListener('input', render);
+
+$('#exportBtn').addEventListener('click', () => {
+  const cols = ['name','denomination','city','state','zip','size_estimate','pastor_name','pastor_title','website','email','email_type','notes'];
+  const lines = [cols.join(',')].concat(filtered().map(d =>
+    cols.map(c => `"${(d[c] || '').toString().replace(/"/g, '""')}"`).join(',')
+  ));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'church-prospects.csv';
+  a.click();
+});
+
+/* ---- boot ---------------------------------------------------------------
+   Load state from the file before first paint, so the page never shows a
+   confident-looking empty sequence that isn't the truth. */
+async function boot() {
+  options(); stateBars();
+  try {
+    const res = await fetch('/api/campaign', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    Object.assign(touches, data.touches || {});
+    Object.assign(statuses, data.statuses || {});
+    setSaveState('saved');
+  } catch (err) {
+    /* No server.py — the published copy. Use this browser's storage and say
+       so, rather than blanking a table that is perfectly readable. */
+    localOnly = true;
+    try {
+      const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+      Object.assign(touches, saved.touches || {});
+      Object.assign(statuses, saved.statuses || {});
+    } catch (e) { /* corrupt draft is not worth an error */ }
+    setSaveState('savedLocal');
+  }
+  tiles(); render();
+}
+boot();
+</script>
+</body>
+</html>
