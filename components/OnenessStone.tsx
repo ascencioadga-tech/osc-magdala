@@ -106,7 +106,7 @@ export function OnenessStone() {
               className="font-serif mt-6 space-y-5 text-lg leading-[1.7] text-ink/85 md:text-xl"
             >
               <p>
-                At the entrance of the future restaurant at Magdala, one stone
+                At the entrance of the future John 17 Landmark at Magdala, one stone
                 will carry the names of the Christian traditions taking part in
                 this work — gathered not on separate monuments, but on a single
                 shared stone.

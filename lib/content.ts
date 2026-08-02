@@ -73,8 +73,8 @@ export type Stone = {
 export const stones: Stone[] = [
   {
     number: 1,
-    label: "Restaurant",
-    oneLine: "The kickoff — a restaurant at Magdala, built and run together.",
+    label: "John 17 Landmark",
+    oneLine: "The kickoff — the John 17 Landmark at Magdala, built and run together.",
     title: "More than a restaurant",
     subtitle: "Building together a living sign of John 17",
     genesis: {
@@ -84,7 +84,7 @@ export const stones: Stone[] = [
         "“If I have found favor in your eyes, my lord, do not pass your servant by. Let a little water be brought, and then you may all wash your feet and rest under this tree. Let me get you something to eat, so you can be refreshed and then go on your way — now that you have come to your servant.”",
       note: "Abraham & Sarah would need a restaurant in their backyard if they were catering to thousands of Galilee’s pilgrims!",
     },
-    body: "Jesus’ prayer for oneness still calls us forward. Built together by Christians from diverse traditions, the OSC Landmark witnesses permanently to John 17:20–23 — a monument to Christ’s prayer and a landmark beckoning us onward, renewed, one step closer in Christ.",
+    body: "Jesus’ prayer for oneness still calls us forward. Built together by Christians from diverse traditions, the John 17 Landmark witnesses permanently to John 17:20–23 — a monument to Christ’s prayer and a landmark beckoning us onward, renewed, one step closer in Christ.",
     cta: { label: "Learn More", href: "#" },
     expand: {
       sections: [
@@ -98,12 +98,12 @@ export const stones: Stone[] = [
             },
             {
               paragraph:
-                "Christians from diverse traditions are building this restaurant together.",
+                "Christians from diverse traditions are building the John 17 Landmark together.",
             },
             { paragraph: "That fact is the message." },
             {
               paragraph:
-                "Before the first meal is served, the restaurant already proclaims something simple and powerful: by God’s grace, disciples of Jesus, still marked by centuries of division, can move from inherited prejudice to friendship, from rivalry to partnership, and from separation to shared service.",
+                "Before the first meal is served, the Landmark already proclaims something simple and powerful: by God’s grace, disciples of Jesus, still marked by centuries of division, can move from inherited prejudice to friendship, from rivalry to partnership, and from separation to shared service.",
             },
           ],
         },
@@ -114,7 +114,7 @@ export const stones: Stone[] = [
           blocks: [
             {
               paragraph:
-                "The restaurant will speak silently to every volunteer who offers hospitality:",
+                "The Landmark will speak silently to every volunteer who offers hospitality:",
             },
             {
               bullets: [
@@ -136,7 +136,7 @@ export const stones: Stone[] = [
           blocks: [
             {
               paragraph:
-                "At Magdala, the OSC Landmark invites guests to experience Jesus’ prayer for oneness through hospitality.",
+                "At Magdala, the John 17 Landmark invites guests to experience Jesus’ prayer for oneness through hospitality.",
             },
             {
               paragraph:
@@ -152,7 +152,7 @@ export const stones: Stone[] = [
             },
             {
               paragraph:
-                "The restaurant welcomes the hungry, the thirsty, the tired, the pilgrim, the visitor, and all who carry burdens of brokenness. In this school of oneness, Christians learn, step by step, to serve together in response to Christ’s prayer: “That they may all be one.”",
+                "The Landmark welcomes the hungry, the thirsty, the tired, the pilgrim, the visitor, and all who carry burdens of brokenness. In this school of oneness, Christians learn, step by step, to serve together in response to Christ’s prayer: “That they may all be one.”",
             },
             {
               paragraph:
@@ -175,22 +175,22 @@ export const stones: Stone[] = [
     images: [
       {
         src: "/restaurant/restaurant-1.jpg",
-        alt: "Magdala Restaurant — exterior view (1)",
-        caption: "Magdala Restaurant · 1",
+        alt: "John 17 Landmark — exterior view (1)",
+        caption: "John 17 Landmark · 1",
         width: 1800,
         height: 1005,
       },
       {
         src: "/restaurant/restaurant-2.jpg",
-        alt: "Magdala Restaurant — exterior view (2)",
-        caption: "Magdala Restaurant · 2",
+        alt: "John 17 Landmark — exterior view (2)",
+        caption: "John 17 Landmark · 2",
         width: 1800,
         height: 1101,
       },
       {
         src: "/restaurant/restaurant-3.jpg",
-        alt: "Magdala Restaurant — exterior view (3)",
-        caption: "Magdala Restaurant · 3",
+        alt: "John 17 Landmark — exterior view (3)",
+        caption: "John 17 Landmark · 3",
         width: 1800,
         height: 1194,
       },
@@ -364,7 +364,7 @@ export const inAction = {
   eyebrow: "One Step Closer in Action",
   title: "Progress on the path.",
   intro:
-    "The work as it unfolds — restaurant, volunteers, artwork, and the encounters along the way.",
+    "The work as it unfolds — the Landmark, volunteers, artwork, and the encounters along the way.",
   /** Self-hosted video file path (e.g. "/motb-recap.mp4"). */
   video: "/motb-video.mp4" as string | undefined,
   /** YouTube URL or ID. Takes precedence over `video` if both are set. */
@@ -479,7 +479,7 @@ export const takeAStep = {
     {
       key: "donors",
       title: "For Friends and Supporters",
-      body: "Help build the restaurant, fund volunteers, commission the artwork. Every gift is a stone laid in the path.",
+      body: "Help build the John 17 Landmark, fund volunteers, commission the artwork. Every gift is a stone laid in the path.",
       cta: { label: "Donate", href: "/benefactors" },
     },
   ],

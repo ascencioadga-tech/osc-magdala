@@ -1269,7 +1269,7 @@ function StoneCarousel({
         <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 text-cream/90">
           <span className="block h-px w-6 bg-gold-light" />
           <span className="text-[10px] uppercase tracking-[0.28em]">
-            Magdala Restaurant
+            John 17 Landmark
           </span>
         </div>
 
