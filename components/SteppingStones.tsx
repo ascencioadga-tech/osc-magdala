@@ -14,6 +14,8 @@ export function SteppingStones() {
   const [active, setActive] = useState<StoneData["number"] | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const prevActive = useRef<StoneData["number"] | null>(null);
   const inView = useInView(sectionRef, { amount: 0.2, once: true });
 
   const handleStoneClick = (n: StoneData["number"]) => {
@@ -21,11 +23,38 @@ export function SteppingStones() {
     setActive((curr) => (curr === n ? null : n));
   };
 
+  // Follow the click with the viewport: opening a stone carries the reader
+  // down to the panel, closing it carries them back up to the stones. The
+  // panel wrapper is always mounted, so its position is stable to scroll to
+  // -- no need to wait for the panel's own mount animation.
+  useEffect(() => {
+    const prev = prevActive.current;
+    prevActive.current = active;
+    if (prev === active) return;
+
+    const behavior: ScrollBehavior = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches
+      ? "auto"
+      : "smooth";
+
+    if (active !== null) {
+      // A beat after the click, so the tap ripple lands before the move.
+      const id = window.setTimeout(() => {
+        panelRef.current?.scrollIntoView({ behavior, block: "start" });
+      }, 80);
+      return () => window.clearTimeout(id);
+    }
+    if (prev !== null) {
+      sectionRef.current?.scrollIntoView({ behavior, block: "start" });
+    }
+  }, [active]);
+
   return (
     <section
       id="stepping-stones"
       ref={sectionRef}
-      className="relative overflow-hidden bg-cream"
+      className="relative scroll-mt-16 overflow-hidden bg-cream md:scroll-mt-20"
     >
       {/* Section header */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 pt-10 md:px-10 md:pt-16">
@@ -109,7 +138,10 @@ export function SteppingStones() {
       </div>
 
       {/* Active stone panel */}
-      <div className="relative z-10 mx-auto max-w-5xl px-6 pb-24 pt-10 md:px-10 md:pb-32">
+      <div
+        ref={panelRef}
+        className="relative z-10 mx-auto max-w-5xl scroll-mt-20 px-6 pb-24 pt-10 md:scroll-mt-24 md:px-10 md:pb-32"
+      >
         <AnimatePresence mode="wait">
           {active !== null ? (
             <motion.div
