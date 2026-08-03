@@ -110,7 +110,7 @@ export const stones: Stone[] = [
         {
           label: "Training Ground",
           heading:
-            "A training ground for OSC-HT volunteers to grow closer together",
+            "A training ground for OSC–HT volunteers to grow closer together",
           blocks: [
             {
               paragraph:
@@ -156,7 +156,7 @@ export const stones: Stone[] = [
             },
             {
               paragraph:
-                "Our hope is that our guests leave with one conviction:",
+                "Our hope is that our guests leave convinced that:",
             },
             {
               bullets: [
@@ -201,7 +201,7 @@ export const stones: Stone[] = [
     label: "Volunteers",
     oneLine: "Volunteers from Catholic, Orthodox, and Reformation churches serving side by side.",
     title: "Volunteers serving side by side",
-    body: "A shared volunteer program where Christians from different faith communities welcome pilgrims together. Mutual respect, real cooperation — hospitality as a sign of the unity we still hope for.",
+    body: "A shared volunteer program where Christians from different faith communities welcome pilgrims together. Mutual respect, real cooperation — hospitality as a sign of the unity we ardently hope for.",
     cta: { label: "Learn More", href: "#" },
     youtube: "https://www.youtube.com/watch?v=YTih2pqq7V4&t=4s",
     expand: {
@@ -311,7 +311,7 @@ export const stones: Stone[] = [
     label: "Worldwide",
     oneLine: "Pilgrims carry the encounter home — leaven for their neighborhoods.",
     title: "Worldwide Resonance",
-    body: "From the shores of Galilee, OSC-HT invites churches, pastors, volunteers, pilgrims, and donors to carry this witness into their own communities: partnership over divisiveness, hospitality over hostility, and long-term friendship over inherited prejudice.",
+    body: "From the shores of Galilee, OSC–HT invites churches, pastors, volunteers, pilgrims, and donors to carry this witness into their own communities: partnership over divisiveness, hospitality over hostility, and long-term friendship over inherited prejudice.",
     cta: { label: "Learn More", href: "#" },
     expand: {
       sections: [
@@ -399,20 +399,20 @@ export const prayer = {
   epigraph: "John 17:20–23",
   title: "One Step Closer Prayer",
   body: [
-    "Jesus, You built the Church on the twelve foundation stones together with the names of the apostles. At Your last meal with the twelve before You suffered, You prayed to Abba, Your Father, that we might all be one so the world would believe that He sent You.",
-    "You welcomed Samaritans and Gentiles, Greeks and Syrophoenicians, Romans and Ethiopians, and so brought together Jew and Gentile. After so many painful and damaging divisions we yearn for a unity that seems almost impossible — but, with You, nothing is impossible.",
-    "Show us how to bring together our five loaves and two fish, or our seven loaves and a few fish, our six jars full of water, even a mere cup of water, so You can reveal Your Kingdom. Help us take one possible step closer together and offer hospitality together, so all can recognize You in the breaking of the Bread.",
+    "Jesus, you built the Church on the twelve foundation stones together with the names of the apostles. At your last meal with the twelve before you suffered, you prayed to Abba, your Father, that we might all be one so the world would believe that he sent you.",
+    "You welcomed Samaritans and Gentiles, Greeks and Syrophoenicians, Romans and Ethiopians, and so brought together Jew and Gentile. After so many painful and damaging divisions we yearn for a unity that seems almost impossible — but, with you, nothing is impossible.",
+    "Show us how to bring together our five loaves and two fish, or our seven loaves and a few fish, our six jars full of water, even a mere cup of water, so you can reveal your Kingdom. Help us take one possible step closer together and offer hospitality together, so all can recognize you in the breaking of the Bread.",
   ],
 };
 
 export const hospitalityPrayer = {
-  epigraph: "When we welcome them, we welcome You",
+  epigraph: "When we welcome them, we welcome you",
   title: "Hospitality Prayer",
   body: [
-    "Jesus, You came to dwell among us, totally dependent on our hospitality. But when You grew, You fed the hungry abundantly, revealing the Father’s love. You accepted human hospitality from the women who provided for You and for the first pilgrim community of Your disciples. Bethany’s three-sibling family regularly welcomed You to their home. Matthew the tax-collector hosted a banquet for You in his house with his friends — sinners who heard the Good News of the Kingdom from Your lips.",
-    "You organized the Last Supper and washed our feet!",
-    "Even on Calvary You were offered a drink, and on Easter Sunday evening, some fish. Disciples unknowingly invited You to supper in Emmaus, and You broke bread to reveal Yourself to them.",
-    "Since Pentecost, the disciples have continued breaking bread together and serving the needy and destitute along the way. When we welcome them, we welcome You! May we continue to do this together until we reach the Heavenly Banquet. Hospitality and revelation are intertwined. We want to go out into the deep (Duc in Altum) to grow one step closer — now, every day, until You come again.",
+    "Jesus, you came to dwell among us, totally dependent on our hospitality. But when you grew, you fed the hungry abundantly, revealing the Father’s love. You accepted human hospitality from the women who provided for you and for the first pilgrim community of your disciples. Bethany’s three-sibling family regularly welcomed you to their home. Matthew the tax-collector hosted a banquet for you in his house with his friends — sinners who heard the Good News of the Kingdom from your lips.",
+    "You charged your disciples to organize the Last Supper and washed our feet!",
+    "Even on Calvary you were offered a drink, and on Easter Sunday evening, some fish. Disciples unknowingly invited you to supper in Emmaus, and you broke bread to reveal yourself to them.",
+    "Since Pentecost, the disciples have continued breaking bread together and serving the needy and destitute along the way. When we welcome them, we welcome you! May we continue to do this together until we reach the Heavenly Banquet. Hospitality and revelation are intertwined. We want to go out into the deep (Duc in Altum) to grow one step closer — now, every day, until you come again.",
     "Come, Lord Jesus!",
   ],
 };

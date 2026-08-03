@@ -29,7 +29,7 @@ const chapters = [
         Animated by Christ&rsquo;s prayer at the Last Supper,{" "}
         <em>&ldquo;that they may all be one&rdquo;</em>{" "}
         (John&nbsp;17:20&ndash;23), and born from the Magdala experience where
-        friendships have begun replacing inherited prejudices, OSC-HT envisages
+        friendships have begun replacing inherited prejudices, OSC&ndash;HT envisages
         Christians from diverse confessions coming closer together while
         serving needy people.
       </>
@@ -52,12 +52,12 @@ const chapters = [
     label: "Toward 2033",
     body: (
       <>
-        Toward 2033, OSC-HT hopes to help celebrate 2000 years of Redemption by
+        Toward 2033, OSC&ndash;HT hopes to help celebrate 2000 years of Redemption by
         fostering a blossoming culture of Christian oneness worldwide: churches
         collaborating in service, witnessing together to Christ&rsquo;s love,
         and preparing future generations to become agents of reconciliation in
         a world burdened by division. OSC&ndash;HT envisions a long-term
-        journey, step by step, not a short campaign. Centuries of division
+        journey of many steps, not a short campaign. Centuries of division
         cannot be healed by one action.
       </>
     ),

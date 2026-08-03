@@ -6,6 +6,7 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { stones, type Stone as StoneData } from "@/lib/content";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import { ScriptureRef } from "@/components/ScriptureRef";
 
 const reverentEase = [0.22, 0.8, 0.32, 1] as const;
 const ROMAN = ["I", "II", "III", "IV"] as const;
@@ -1109,10 +1110,13 @@ function StonePanel({ stone }: { stone: StoneData }) {
                         exit={{ opacity: 0, x: -16 }}
                         transition={{ duration: 0.5, ease: reverentEase }}
                       >
+                        {/*
+                          No numeral here. The stone itself already carries
+                          its numeral; repeating I/II/III on each sub-section
+                          inside it numbers the wrong thing and reads as
+                          clutter. The gold rule alone marks the heading.
+                        */}
                         <div className="flex items-baseline gap-4">
-                          <span className="font-serif text-sm italic text-gold/85">
-                            {ROMAN[safeIndex]}
-                          </span>
                           <span
                             aria-hidden="true"
                             className="block h-px w-10 bg-gold"
@@ -1209,7 +1213,7 @@ function StonePanel({ stone }: { stone: StoneData }) {
               <div className="flex items-center gap-3">
                 <span aria-hidden="true" className="block h-px w-10 bg-gold" />
                 <p className="eyebrow text-terracotta">
-                  {stone.genesis.reference}
+                  <ScriptureRef>{stone.genesis.reference}</ScriptureRef>
                 </p>
               </div>
               <p className="font-serif mt-5 max-w-3xl text-xl italic leading-[1.6] text-burgundy/90 md:text-2xl">

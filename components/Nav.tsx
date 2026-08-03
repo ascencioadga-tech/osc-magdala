@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { nav } from "@/lib/content";
+import { ScriptureRef } from "@/components/ScriptureRef";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -32,7 +33,7 @@ export function Nav() {
       >
         <span className="mx-auto flex max-w-7xl items-center justify-center gap-2.5 px-6 py-2.5 md:px-10">
           <span className="text-xs font-semibold uppercase tracking-[0.22em] md:text-sm">
-            John&nbsp;17:20&ndash;23
+            John&nbsp;17<ScriptureRef>:20–23</ScriptureRef>
           </span>
           <span className="hidden font-serif text-sm italic text-cream/75 sm:inline md:text-base">
             &mdash; &ldquo;that they may all be one&rdquo;

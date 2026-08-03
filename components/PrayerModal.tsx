@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ScriptureRef } from "@/components/ScriptureRef";
 
 const reverentEase = [0.22, 0.8, 0.32, 1] as const;
 
@@ -93,7 +94,9 @@ export function PrayerModal({ open, onClose, prayer }: PrayerModalProps) {
                   />
                 ))}
               </svg>
-              <p className="eyebrow mt-4 text-terracotta">{prayer.epigraph}</p>
+              <p className="eyebrow mt-4 text-terracotta">
+                <ScriptureRef>{prayer.epigraph}</ScriptureRef>
+              </p>
               <h2
                 id="osc-prayer-title"
                 className="font-serif mt-3 text-3xl italic text-burgundy md:text-[40px]"

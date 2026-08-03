@@ -107,7 +107,7 @@ export function Footer() {
             © {new Date().getFullYear()} One Step Closer · A Magdala initiative.
           </span>
           <span className="font-serif italic text-cream/65">
-            “That they may all be one.” — John 17 : 21
+            “That they may all be one.” — John 17:21
           </span>
         </div>
       </div>

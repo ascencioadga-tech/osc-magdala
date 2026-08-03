@@ -59,7 +59,7 @@ export function MagdalaMosaic() {
               transition={{ duration: 0.7, ease: reverentEase }}
               className="eyebrow text-terracotta"
             >
-              Another way to be part
+              Another way to be a part
             </motion.p>
 
             <motion.h2
@@ -78,7 +78,8 @@ export function MagdalaMosaic() {
               className="font-serif mt-7 space-y-4 text-lg leading-[1.7] text-ink/85 md:text-xl"
             >
               <p>
-                Designed by <em>María Jesús Ortiz de Fernández</em> and crafted
+                Designed by <em>María Jesús Ortiz de Fernández</em>{" "}
+                and crafted
                 at the Burg Engelsdorf studio in Germany, the mosaic spans
                 114&nbsp;m² and maps the land where Jesus walked — over 1.5
                 million handcrafted stones, set into the floor of Magdala one
